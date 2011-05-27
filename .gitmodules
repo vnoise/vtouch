@@ -1,0 +1,12 @@
+[submodule "LiveOSC"]
+	path = LiveOSC
+	url = git@github.com:vnoise/LiveOSC.git
+[submodule "node-osc"]
+	path = node-osc
+	url = git@github.com:vnoise/node-osc.git
+[submodule "Socket.IO-node"]
+	path = Socket.IO-node
+	url = git@github.com:vnoise/Socket.IO-node.git
+[submodule "canvas.ui"]
+	path = canvas.ui
+	url = git@github.com:vnoise/canvas.ui.git
