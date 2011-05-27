@@ -61,6 +61,22 @@ function controller(req, res) {
     }
 }
 
+var clients = [];
+
+var oscServer = new osc.Server(9001, '0.0.0.0');
+var oscClient = new _osc.Client(9000, '127.0.0.1');
+
+oscServer.on('message', function(message) {
+    console.log(message);
+
+    for (var id in clients) {
+        clients[id].send({ 
+            address: message[0],
+            args: message.slice(1)
+        });
+    }
+});
+
 var server = http.createServer(controller);
 
 server.listen(80, "0.0.0.0");
@@ -68,17 +84,9 @@ server.listen(80, "0.0.0.0");
 var io = io.listen(server);
 
 io.on('connection', function(client) {
-    var server = new osc.Server(9001, '0.0.0.0');
-    var oscClient = new _osc.Client(9000, '127.0.0.1');
-    
-    server.on('message', function(message) {
-        // console.log(message);
+    clients[client.sessionId] = client;
 
-        client.send({ 
-            address: message[0],
-            args: message.slice(1)
-        });
-    });
+    client.send({address: 'connect', args: [] });
 
     client.on('message', function(message) {
         var types = message.types;
@@ -93,12 +101,12 @@ io.on('connection', function(client) {
             msg.append(args[i], types[i]);
         }
 
-        console.log(message);
+        // console.log(message);
 
         oscClient.send(msg);
     });
 
-    client.on('disconnect', function(){
-        console.log("client disconnected");
+    client.on('disconnect', function() {
+        delete clients[client.sessionId];
     });
 });
