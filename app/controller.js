@@ -11,28 +11,11 @@ var Controller = new Class({
             height: 600
         });
 
-        //this.volumePanel = this.root.add({ type: VolumePanel });
         this.mutePanel = this.root.add({ type: MuteButtonPanel});
         this.soloPanel = this.root.add({ type: SoloButtonPanel});
         this.armPanel = this.root.add({ type: ArmButtonPanel});
-        
-        /*this.mutePanel = this.root.add({ 
-            type: MuteButton,
-            bgColor: "#FF0000",
-            frontColor: "#FFFF00",
-            labelColor: "#00FF00"
-        });
-        */
-        
-        
-        this.touchtracker = new TouchTracker(this);
+                
         this.connect();
-
-        setInterval(this.draw.bind(this), 50);
-    },
-
-    draw: function() {
-        this.root.draw();
     },
 
     send: function(address, types) {
