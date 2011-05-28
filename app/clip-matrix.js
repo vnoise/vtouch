@@ -4,9 +4,8 @@ var Clip = new Class({
     initialize: function(options) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
         this._state = 0;
-        this._color = "#FF0000";
+        this._color = "#003047";
         this._clipPos = 0;
-        this._name = name;
         this.label = "";
 
         Widget.prototype.initialize.call(this, options);
@@ -20,19 +19,20 @@ var Clip = new Class({
     clipName: function(name,color){
         //console.log(name)
         console.log(color)
-        this._name = name;
-        this._name = color;
+        this.label = name;
+        this._color = color;
     },
-    drawCanvas: function(context) {
-        if (this._state == false){
+    drawCanvas: function(context) { 
+        if (this._state == 0){
             context.fillStyle = this.bgColor;
         }else{
-            context.fillStyle = this.frontColor;
+            context.fillStyle = this._color;
         }
+        
         context.fillRect(0, 0, this.width, this.height);
         context.fillStyle = this.labelColor;
         context.font = "20px Helvetica";
-        context.fillText(this.label, 2, this.height - 40, this.width - 20);
+        context.fillText(this.label, 2, this.height - this.height/10 , this.width - this.width/10);
     },
 
     onTouchDown: function(event) {
@@ -64,11 +64,11 @@ var ClipMatrix = new Class({
                     type: Clip,
                     track: i,
                     clip: j,
-                    bgColor: "#FF0000",
+                    bgColor: "#003047",
                     frontColor: "#FFFF00",
-                    labelColor: "#00FF00",
+                    labelColor: "#FFFFFF",
                     marginRight: 10,
-                    label: i + 1,
+                    label: i *j,
                     on: {
                         click: this.onClick.bind(this, i)
                     }
@@ -81,17 +81,17 @@ var ClipMatrix = new Class({
         var x = 0;
         var y = 0;
         var gap = 10;
-        var w = this.width/8;
-        var h = this.height/8;
+        var w = this.width/8 ;
+        var h = this.height/8 ;
         
 
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
                 //console.log(x,y)
-                this.matrix[i][j].extent(x, y, w, h);
-                 x = j*w;   
+                this.matrix[j][i].extent(j*w, i*h, w, h);
+          
             }
-            y = i*h;  
+            
         }        
     },
     
