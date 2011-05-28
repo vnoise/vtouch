@@ -4,11 +4,9 @@ var Controller = new Class({
 
     initialize: function() {
         this.root = new VTouchWidget({
-            canvas: document.getElementById('canvas'),
+            // canvas: document.getElementById('canvas'),
             controller: this,
-            layout: 'horizontal',
-            width: 800,
-            height: 600
+            layout: 'horizontal'
         });
 
         this.mutePanel = this.root.add({ type: MuteButtonPanel});
