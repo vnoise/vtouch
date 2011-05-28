@@ -4,10 +4,11 @@ var RootPanel = new Class({
     initialize: function(options){
         VTouchWidget.prototype.initialize.call(this, options);
 
-        //this.volumePanel = this.root.add({ type: VolumePanel });
-        this.clipMatrix = this.add({ type: ClipMatrix});
+        this.volumePanel = this.add({ type: VolumePanel });
         this.layout = "vertical";
-        this.clipMatrix.requestUpdate()
+        //this.clipMatrix = this.add({ type: ClipMatrix});
+        //this.layout = "vertical";
+        //this.clipMatrix.requestUpdate()
        
         /*this.mutePanel = this.add({ type: MuteButtonPanel});
         this.soloPanel = this.add({ type: SoloButtonPanel});

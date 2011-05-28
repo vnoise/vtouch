@@ -1,14 +1,14 @@
 var SliderPanel = new Class({
     Extends: VTouchWidget,
 
-    initialize: function(options) {
+    initialize: function(options, sliderType) {
         this.layout = 'horizontal';
 
         Widget.prototype.initialize.call(this, options);
 
         for (var i = 0; i < 8; i++) {
             this.add({
-                type: Slider,
+                type: sliderType,
                 marginRight: 10,
                 label: i + 1,
                 on: {
@@ -24,9 +24,15 @@ var VolumePanel = new Class({
     Extends: SliderPanel,
 
     initialize: function(options) {
-        SliderPanel.prototype.initialize.call(this, options);
+        SliderPanel.prototype.initialize.call(this, options, VolumeSlider);
+        
+        this.listen("/live/volume", this.onLiveVolume.bind(this));
+        this.listen("/live/track/meter", this.onTrackMeter.bind(this))
+    },
 
-        this.controller.addEvent("/live/volume", this.onLiveVolume.bind(this));
+    onTrackMeter: function(track, pan, value){
+        //console.log(track, pan, value)
+        this.children[track].levelValue = value;
     },
 
     onLiveVolume: function(track, value) {
