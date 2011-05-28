@@ -35,7 +35,7 @@ var Controller = new Class({
     },
 
     onConnect: function() {
-        this.root = new RootPanel({
+        this.root = new Screen({
             controller: this
         });
 

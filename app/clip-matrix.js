@@ -16,13 +16,10 @@ var Clip = new Class({
     },
     
     clipInfo: function(state) {
-        //console.log(state)
         this._state = state;
     },
     
     clipName: function(name,color){
-        //console.log(name)
-        console.log(color)
         this.label = name;
         this._color = color;
     },

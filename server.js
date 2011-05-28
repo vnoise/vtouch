@@ -67,7 +67,7 @@ var oscServer = new osc.Server(9001, '0.0.0.0');
 var oscClient = new _osc.Client(9000, '127.0.0.1');
 
 oscServer.on('message', function(message) {
-    // console.log(message);
+    console.log(message);
 
     for (var id in clients) {
         clients[id].send({ 
