@@ -11,6 +11,10 @@ var Clip = new Class({
         Widget.prototype.initialize.call(this, options);
     },
     
+    clipPos: function(pos){
+      this._clipPos = pos;  
+    },
+    
     clipInfo: function(state) {
         //console.log(state)
         this._state = state;
@@ -33,6 +37,10 @@ var Clip = new Class({
         context.fillStyle = this.labelColor;
         context.font = "20px Helvetica";
         context.fillText(this.label, 2, this.height - this.height/10 , this.width - this.width/10);
+        if (this._state == 2){
+            context.fillStyle = "rgba(255,255,255,0.5)";
+            context.fillRect(0, 0, this.width * this._clipPos, this.height);// Rectangle(pos=pos, size=(w * self.position, h)))
+        }
     },
 
     onTouchDown: function(event) {
@@ -49,8 +57,9 @@ var ClipMatrix = new Class({
     initialize: function(options) {
 
         VTouchWidget.prototype.initialize.call(this, options);
-        this.controller.addEvent("/live/clip/info", this.onClipInfo.bind(this));
-        this.controller.addEvent("/live/name/clip", this.onClipName.bind(this));
+        this.listen("/live/clip/info", this.onClipInfo.bind(this));
+        this.listen("/live/name/clip", this.onClipName.bind(this));
+        this.listen("/live/clip/position", this.onClipPosition.bind(this))
       
         
         this.matrix = [];
@@ -90,6 +99,10 @@ var ClipMatrix = new Class({
             }
             
         }        
+    },
+    
+    onClipPosition: function(track, clip, position, length, loop_start,loop_end){
+        this.matrix[track][clip].clipPos( position / length);
     },
     
     onClipName: function(track, clip, name,color) {
