@@ -46,21 +46,41 @@ var ClipMatrix = new Class({
     initialize: function(options) {
 
         VTouchWidget.prototype.initialize.call(this, options);
-		this.controller.addEvent("/live/mute", this.onPlay.bind(this));
-		
+
+        this.controller.addEvent("/live/mute", this.onPlay.bind(this));
+        
+        this.matrix = [];
+
         for (var i = 0; i < 8; i++) {
-            this.add({
-                type: Button,
-                bgColor: "#FF0000",
-            	frontColor: "#FFFF00",
-            	labelColor: "#00FF00",
-                marginRight: 10,
-                label: i + 1,
-                on: {
-                    click: this.onClick.bind(this, i)
-                }
-            });
-        }        
+            this.matrix[i] = [];
+
+            for (var j = 0; j < 8; j++) {
+                this.matrix[i][j] = this.add({
+                    type: Button,
+                    bgColor: "#FF0000",
+                    frontColor: "#FFFF00",
+                    labelColor: "#00FF00",
+                    marginRight: 10,
+                    label: i + 1,
+                    on: {
+                        click: this.onClick.bind(this, i)
+                    }
+                });
+            }        
+        }
+    },
+
+    doLayout: function() {
+        var x = 0;
+        var y = 0;
+        var w = 10;
+        var h = 10;
+
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                this.matrix[i][j].extent(x, y, w, h);
+            }
+        }
     },
     
     onMuteState: function(track, state) {
