@@ -61,6 +61,8 @@ var ClipMatrix = new Class({
         this.listen("/live/name/clip", this.onClipName.bind(this));
         this.listen("/live/clip/position", this.onClipPosition.bind(this))
       
+        this._xNavOffset = 0;
+        this._yNavOffset = 0;
         
         this.matrix = [];
         
@@ -83,7 +85,15 @@ var ClipMatrix = new Class({
             }        
         }
     },
-
+    
+    setNavOffsetX: function(offset){
+        this._xNavOffset = offset;
+    },
+    
+    setNavOffsetY: function(offset){
+        this._yNavOffset = offset;
+    },
+    
     doLayout: function() {
         var x = 0;
         var y = 0;
@@ -91,7 +101,6 @@ var ClipMatrix = new Class({
         var w = this.width/8 ;
         var h = this.height/8 ;
         
-
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
                 //console.log(x,y)
@@ -102,7 +111,7 @@ var ClipMatrix = new Class({
     },
     
     onClipPosition: function(track, clip, position, length, loop_start,loop_end){
-        this.matrix[track][clip].clipPos( position / length);
+        this.matrix[this.getTrack(track)][this.getClip(clip)].clipPos( position / length);
     },
     
     onClipName: function(track, clip, name,color) {
@@ -110,20 +119,28 @@ var ClipMatrix = new Class({
         g = (color >> 8) & 0xff;
         b = (color >> 0) & 0xff;
         color =  "rgb("+r+","+g+","+b+")";
-        this.matrix[track][clip].clipName(name,color);
+        this.matrix[this.getTrack(track)][this.getClip(clip)].clipName(name,color);
     },
     
+    getTrack: function(track){
+        return track - this._xNavOffset;
+    },
+    
+    getClip: function(clip){
+        return clip - this._yNavOffset;
+    },
+        
     onClipInfo: function(track, clip, state) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
-        this.matrix[track][clip].clipInfo(state);
+        this.matrix[this.getTrack(track)][this.getClip(clip)].clipInfo(state);
     },
     
     requestUpdate: function()
     {   
        for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
-                this.send("/live/clip/info", "ii", i, j);
-                this.send("/live/name/clip","ii",i,j);
+                this.send("/live/clip/info", "ii", i + this._xNavOffset, j + this._yNavOffset );
+                this.send("/live/name/clip", "ii", i + this._xNavOffset, j + this._yNavOffset );
             }
        }
     },
