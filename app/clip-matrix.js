@@ -4,6 +4,7 @@ var Clip = new Class({
     initialize: function(options) {
         this._state = false;
         this._isPlaying = false;
+        this._color = "#FF0000";
         this._clipPos = 0;
         this.label = "";
 
