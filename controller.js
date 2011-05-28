@@ -13,7 +13,10 @@ var Controller = new Class({
         });
 
         //this.volumePanel = this.root.add({ type: VolumePanel });
-        this.volumePanel = this.root.add({ type: MuteButtonPanel});
+        this.mutePanel = this.root.add({ type: MuteButtonPanel});
+        this.soloPanel = this.root.add({ type: SoloButtonPanel});
+        this.armPanel = this.root.add({ type: ArmButtonPanel});
+        
         /*this.mutePanel = this.root.add({ 
             type: MuteButton,
             bgColor: "#FF0000",
