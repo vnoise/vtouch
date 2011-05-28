@@ -1,14 +1,32 @@
-var SliderPanel = new Class({
-    Extends: VTouchWidget,
+var VTouchSlider = new Class({
+    Extends: Slider,
 
-    initialize: function(options, sliderType) {
+    initialize: function(options) {
+        this.levelValue = 0;
+
+        Slider.prototype.initialize.call(this, options);
+    },
+
+    drawCanvas: function(context) {
+        Slider.prototype.drawCanvas.call(this, context);
+
+        context.fillStyle = "rgba(255,255,255,0.5)";
+        context.fillRect(0, this.height, this.width, (this.height * this.levelValue) * -1);
+         
+    }
+});
+
+var SliderPanel = new Class({
+    Extends: Widget,
+
+    initialize: function(options) {
         this.layout = 'horizontal';
 
         Widget.prototype.initialize.call(this, options);
 
         for (var i = 0; i < 8; i++) {
             this.add({
-                type: sliderType,
+                type: VTouchSlider,
                 marginRight: 10,
                 label: i + 1,
                 on: {
@@ -24,10 +42,12 @@ var VolumePanel = new Class({
     Extends: SliderPanel,
 
     initialize: function(options) {
-        SliderPanel.prototype.initialize.call(this, options, VolumeSlider);
-        /*this.volMessage = volMessage;
-        this.levelMessage = levelMessage;
-        */
+        SliderPanel.prototype.initialize.call(this, options);
+
+        if (this.volMessage === undefined || this.levelMessage === undefined) {
+            throw "messages undefined";
+        }
+
         this.listen(this.volMessage, this.onLiveVolume.bind(this));
         this.listen(this.levelMessage, this.onTrackMeter.bind(this))
     },
@@ -51,6 +71,7 @@ var TrackPanel = new Class({
     initialize: function(options) {
         this.volMessage = "/live/volume";
         this.levelMessage = "/live/track/meter";
+
         VolumePanel.prototype.initialize.call(this, options);
     }
 });
@@ -61,6 +82,7 @@ var ReturnPanel = new Class({
     initialize: function(options) {
         this.volMessage = "/live/return/volume";
         this.levelMessage = "/live/return/meter";
+
         VolumePanel.prototype.initialize.call(this, options);
     }
 });

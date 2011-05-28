@@ -1,11 +1,13 @@
 var RootPanel = new Class({
-    Extends: VTouchWidget,
+    Extends: Widget,
 
     initialize: function(options){
-        VTouchWidget.prototype.initialize.call(this, options);
+        Widget.prototype.initialize.call(this, options);
 
-        this.volumePanel = this.add({ type: TrackPanel });
+        this.trackPanel = this.add({ type: TrackPanel });
+        this.clipMatrix = this.add({ type: ClipMatrix });
         this.layout = "vertical";
+
         //this.clipMatrix = this.add({ type: ClipMatrix});
         //this.layout = "vertical";
         //this.clipMatrix.requestUpdate()

@@ -36,7 +36,7 @@ var Controller = new Class({
 
     onConnect: function() {
         this.root = new RootPanel({
-            controller: this,
+            controller: this
         });
 
         console.log("socket.io connected");

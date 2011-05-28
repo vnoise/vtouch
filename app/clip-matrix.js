@@ -52,11 +52,11 @@ var Clip = new Class({
 });
 
 var ClipMatrix = new Class({
-    Extends: VTouchWidget,
+    Extends: Widget,
 
     initialize: function(options) {
+        Widget.prototype.initialize.call(this, options);
 
-        VTouchWidget.prototype.initialize.call(this, options);
         this.listen("/live/clip/info", this.onClipInfo.bind(this));
         this.listen("/live/name/clip", this.onClipName.bind(this));
         this.listen("/live/clip/position", this.onClipPosition.bind(this))
