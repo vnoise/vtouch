@@ -43,7 +43,7 @@ var Controller = new Class({
     },
 
     onMessage: function(message) {
-        console.log("receive: " + message.address + " " + message.args);
+        //console.log("receive: " + message.address + " " + message.args);
 
         this.fireEvent(message.address, message.args);
     },

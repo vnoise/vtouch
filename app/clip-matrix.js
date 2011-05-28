@@ -37,7 +37,7 @@ var Clip = new Class({
 
     onTouchDown: function(event) {
         //this._state = ! this._state; 
-        this.fireEvent("click", this.track, this.clip, this._state);
+        this.fireEvent("click", [this.track, this.clip, this._state]);
         return true;
     }
 
@@ -49,8 +49,6 @@ var ClipMatrix = new Class({
     initialize: function(options) {
 
         VTouchWidget.prototype.initialize.call(this, options);
-
-        //this.controller.addEvent("/live/name/clip", this.onClipInfo.bind(this));
         this.controller.addEvent("/live/clip/info", this.onClipInfo.bind(this));
         this.controller.addEvent("/live/name/clip", this.onClipName.bind(this));
       
@@ -68,9 +66,9 @@ var ClipMatrix = new Class({
                     frontColor: "#FFFF00",
                     labelColor: "#FFFFFF",
                     marginRight: 10,
-                    label: i *j,
+                    label: "",
                     on: {
-                        click: this.onClick.bind(this, i)
+                        click: this.onClick.bind(this)
                     }
                 });
             }        
@@ -89,7 +87,6 @@ var ClipMatrix = new Class({
             for (var j = 0; j < 8; j++) {
                 //console.log(x,y)
                 this.matrix[j][i].extent(j*w, i*h, w, h);
-          
             }
             
         }        
@@ -119,11 +116,9 @@ var ClipMatrix = new Class({
     },
 
     onClick: function(track, clip, state) {
-        if (state){
-            this.send("/live/play/clip", "ii", track, clip) ; 
-        }else if (state) {
-            this.send("/live/stop/clip", "ii", track, clip) ; 
-        }
+        //debugger;
+        this.send("/live/play/clipslot", "ii", track, clip) ; 
+        
     }
 });
 
