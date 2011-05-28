@@ -3,17 +3,36 @@ var Controller = new Class({
     Implements: Events,
 
     initialize: function() {
+        
+        this.connect();
+    },
+    
+    initWidgets: function(){
         this.root = new VTouchWidget({
-            // canvas: document.getElementById('canvas'),
             controller: this,
-            layout: 'horizontal'
+            layout: 'horizontal',
         });
 
-        this.mutePanel = this.root.add({ type: MuteButtonPanel});
+        //this.volumePanel = this.root.add({ type: VolumePanel });
+        this.clipMatrix = this.root.add({ type: ClipMatrix});
+        //this.clipMatrix.x = 200;
+        //this.clipMatrix.y = 200;
+        
+        this.clipMatrix.requestUpdate()
+        this.touchtracker = new TouchTracker(this);
+        /*this.mutePanel = this.root.add({ type: MuteButtonPanel});
         this.soloPanel = this.root.add({ type: SoloButtonPanel});
         this.armPanel = this.root.add({ type: ArmButtonPanel});
-                
-        this.connect();
+        */
+       
+        /*this.mutePanel = this.root.add({ 
+            type: MuteButton,
+            bgColor: "#FF0000",
+            frontColor: "#FFFF00",
+            labelColor: "#00FF00"
+        });
+        */
+        
     },
 
     send: function(address, types) {
@@ -45,6 +64,7 @@ var Controller = new Class({
     },
 
     onConnect: function() {
+        this.initWidgets();
         console.log("socket.io connected");
     },
 
