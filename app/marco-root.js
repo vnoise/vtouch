@@ -4,7 +4,7 @@ var RootPanel = new Class({
     initialize: function(options){
         VTouchWidget.prototype.initialize.call(this, options);
 
-        this.volumePanel = this.add({ type: VolumePanel });
+        this.volumePanel = this.add({ type: TrackPanel });
         this.layout = "vertical";
         //this.clipMatrix = this.add({ type: ClipMatrix});
         //this.layout = "vertical";

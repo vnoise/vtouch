@@ -25,13 +25,14 @@ var VolumePanel = new Class({
 
     initialize: function(options) {
         SliderPanel.prototype.initialize.call(this, options, VolumeSlider);
-        
-        this.listen("/live/volume", this.onLiveVolume.bind(this));
-        this.listen("/live/track/meter", this.onTrackMeter.bind(this))
+        /*this.volMessage = volMessage;
+        this.levelMessage = levelMessage;
+        */
+        this.listen(this.volMessage, this.onLiveVolume.bind(this));
+        this.listen(this.levelMessage, this.onTrackMeter.bind(this))
     },
 
     onTrackMeter: function(track, pan, value){
-        //console.log(track, pan, value)
         this.children[track].levelValue = value;
     },
 
@@ -40,6 +41,26 @@ var VolumePanel = new Class({
     },
 
     onChange: function(track, value) {
-        this.send("/live/volume", "if", track, value)
+        this.send(this.volMessage, "if", track, value)
+    }
+});
+
+var TrackPanel = new Class({
+    Extends: VolumePanel,
+
+    initialize: function(options) {
+        this.volMessage = "/live/volume";
+        this.levelMessage = "/live/track/meter";
+        VolumePanel.prototype.initialize.call(this, options);
+    }
+});
+
+var ReturnPanel = new Class({
+    Extends: VolumePanel,
+
+    initialize: function(options) {
+        this.volMessage = "/live/return/volume";
+        this.levelMessage = "/live/return/meter";
+        VolumePanel.prototype.initialize.call(this, options);
     }
 });
