@@ -12,8 +12,17 @@ var Controller = new Class({
             height: 600
         });
 
-        this.volumePanel = this.root.add({ type: VolumePanel });
-
+        //this.volumePanel = this.root.add({ type: VolumePanel });
+        this.volumePanel = this.root.add({ type: MuteButtonPanel});
+        /*this.mutePanel = this.root.add({ 
+            type: MuteButton,
+            bgColor: "#FF0000",
+            frontColor: "#FFFF00",
+            labelColor: "#00FF00"
+        });
+        */
+        
+        
         this.touchtracker = new TouchTracker(this);
         this.connect();
 
