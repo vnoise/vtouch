@@ -7,7 +7,7 @@ var Track = new Class({
         this.layout = 'vertical';
 
         this.label = this.add({
-            type: Label,
+            type: Button,
             label: this.name,
             bgColor: '#300'         
         });
@@ -24,7 +24,7 @@ var Track = new Class({
         });
 
         this.mute = this.add({
-            type: Button,
+            type: ToggleButton,
             bgColor: '#300',
             fgColor: '#900',
             fontColor: 'rgba(255,255,255,0.5)',
@@ -38,7 +38,7 @@ var Track = new Class({
         });
 
         this.solo = this.add({
-            type: Button,
+            type: ToggleButton,
             bgColor: '#030',
             fgColor: '#060',
             fontColor: 'rgba(255,255,255,0.5)',
@@ -52,7 +52,7 @@ var Track = new Class({
         });
 
         this.arm = this.add({
-            type: Button,
+            type: ToggleButton,
             bgColor: '#003',
             fgColor: '#006',
             fontColor: 'rgba(255,255,255,0.5)',

@@ -1,16 +1,31 @@
-var Label = new Class({
+var Button = new Class({
     Extends: Widget,
 
     initialize: function(options) {
         this.label = "";
+        this.textAlign = "center";
+        this.fontColor = "#fff";
+        this.fontName = "Arial";
+        this.fontSize = 10;
 
         Widget.prototype.initialize.call(this, options);
     },
 
-    drawCanvas: function(context) {
+    drawBackground: function(context, style) {
+        context.fillStyle = style;
+        context.fillRect(0, 0, this.width, this.height);
+    },
+
+    drawLabel: function(context) {
+        context.textAlign = this.textAlign;
         context.fillStyle = this.fontColor;
-        context.font = this.height / 2 + "px " + this.fontName;
-        context.fillText(this.label, 2, this.height * 0.75);
+        context.font = (this.height * this.fontSize / 25) + "px " + this.fontName;
+        context.fillText(this.label, this.width / 2, this.height / 2 + this.height * this.fontSize / 100);
+    },
+
+    drawCanvas: function(context) {
+        this.drawBackground(context, this.bgColor);
+        this.drawLabel(context);
     },
 
     onTouchDown: function(event) {
@@ -20,22 +35,17 @@ var Label = new Class({
 
 });
 
-var Button = new Class({
-    Extends: Widget,
+var ToggleButton = new Class({
+    Extends: Button,
 
     initialize: function(options) {
         this.state = false;
-        this.label = "";
-
-        Widget.prototype.initialize.call(this, options);
+        Button.prototype.initialize.call(this, options);
     },
 
     drawCanvas: function(context) {
-        context.fillStyle = this.state ? this.fgColor : this.bgColor;
-        context.fillRect(0, 0, this.width, this.height);
-        context.fillStyle = this.fontColor;
-        context.font = "20px Helvetica";
-        context.fillText(this.label, 2, this.height / 2);
+        this.drawBackground(context, this.state ? this.fgColor : this.bgColor);
+        this.drawLabel(context);
     },
 
     onTouchDown: function(event) {

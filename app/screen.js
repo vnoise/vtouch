@@ -1,19 +1,15 @@
 var ScreenButton = new Class({
-    Extends: Widget,
+    Extends: Button,
 
     initialize: function(options) {
         this.active = false;
-        this.label = "";
 
-        Widget.prototype.initialize.call(this, options);
+        Button.prototype.initialize.call(this, options);
     },
 
     drawCanvas: function(context) {
-        context.fillStyle = this.active ? this.activeColor : this.bgColor;
-        context.fillRect(0, 0, this.width, this.height);
-        context.fillStyle = this.labelColor;
-        context.font = "20px Helvetica";
-        context.fillText(this.label, 2, this.height - 40, this.width - 20);
+        this.drawBackground(context, this.active ? this.fgColor : this.bgColor);
+        this.drawLabel(context);
     },
 
     onTouchDown: function(event) {
@@ -53,8 +49,7 @@ var Screen = new Class({
             type: ScreenButton,
             label: label,
             bgColor: "#333",
-            activeColor: "#ccc",
-            labelColor: "#999",
+            fgColor: "#ccc",
             marginRight: 10,
             on: {
                 click: this.onClickButton.bind(this, panel)
