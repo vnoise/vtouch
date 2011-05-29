@@ -1,5 +1,5 @@
 var Clip = new Class({
-    Extends: Widget,
+    Extends: Button,
 
     initialize: function(options) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
@@ -8,11 +8,11 @@ var Clip = new Class({
         this._clipPos = 0;
         this.label = "";
 
-        Widget.prototype.initialize.call(this, options);
+        Button.prototype.initialize.call(this, options);
     },
     
     clipPos: function(pos){
-      this._clipPos = pos;  
+        this._clipPos = pos;  
     },
     
     clipInfo: function(state) {
@@ -23,26 +23,21 @@ var Clip = new Class({
         this.label = name;
         this._color = color;
     },
+
     drawCanvas: function(context) { 
-        if (this._state == 0){
-            context.fillStyle = this.bgColor;
-        }else{
-            context.fillStyle = this._color;
-        }
-        context.fillRect(0, 0, this.width, this.height);
-        context.fillStyle = this.labelColor;
-        fontSize = this.height/4;
-        context.font = fontSize + "px Helvetica";
-        context.fillText(this.label, 2, this.height - this.height/10 , this.width - this.width/10);
+        this.drawBackground(context, this._state == 0 ? this.bgColor : this._color);
+        this.drawLabel(context);
+
         if (this._state == 2){
             context.fillStyle = "rgba(255,255,255,0.5)";
             context.fillRect(0, 0, this.width * this._clipPos, this.height);// Rectangle(pos=pos, size=(w * self.position, h)))
         }
+
         if (this._state == 2 || this._state == 3 ){
             context.strokeStyle = "rgb(255,255,255)";
             context.lineWidth = 2
             context.strokeRect(0+context.lineWidth/2, 0+context.lineWidth/2, 
-                this.width - context.lineWidth, this.height - context.lineWidth);// Rectangle(pos=pos, size=(w * self.position, h)))
+                               this.width - context.lineWidth, this.height - context.lineWidth);// Rectangle(pos=pos, size=(w * self.position, h)))
         }
     },
 
@@ -76,9 +71,9 @@ var ClipMatrix = new Class({
                     type: Clip,
                     track: i,
                     clip: j,
+                    fontSize: 8,
                     bgColor: "#003047",
-                    frontColor: "#FFFF00",
-                    labelColor: "#FFFFFF",
+                    fgColor: "#FFFF00",
                     marginRight: 10,
                     label: "",
                     on: {
