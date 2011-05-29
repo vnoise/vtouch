@@ -23,7 +23,9 @@ var TrackPanel = new Class({
                 marginRight: 10,
                 on: {
                     volume: this.onVolume.bind(this),
-                    mute: this.onMute.bind(this)
+                    mute: this.onMute.bind(this),
+                    solo: this.onSolo.bind(this),
+                    arm: this.onArm.bind(this)
                 }
             });
         }        
@@ -44,7 +46,7 @@ var TrackPanel = new Class({
     },
 
     onLiveMute: function(track, state) {
-        this.children[track].mute.state = state;
+        this.children[track].mute.state = state ;
     },
 
     onLiveSolo: function(track, state) {
@@ -52,6 +54,7 @@ var TrackPanel = new Class({
     },
 
     onLiveArm: function(track, state) {
+        console.log("onLiveÁrm ->", track, state)
         this.children[track].arm.state = state;
     },
 
@@ -60,14 +63,14 @@ var TrackPanel = new Class({
     },
 
     onMute: function(track, state) {
-        this.send(this.messages.mute, "ii", track, value)
+        this.send(this.messages.mute, "ii", track, state ? 1 : 0 )
     },
 
     onSolo: function(track, state) {
-        this.send(this.messages.solo, "ii", track, value)
+        this.send(this.messages.solo, "ii", track, state ? 1 : 0)
     },
 
     onArm: function(track, state) {
-        this.send(this.messages.arm, "ii", track, value)
+        this.send(this.messages.arm, "ii", track, state ? 1 : 0)
     }
 });

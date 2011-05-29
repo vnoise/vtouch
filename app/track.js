@@ -26,8 +26,8 @@ var Track = new Class({
 
         this.mute = this.add({
             type: ToggleButton,
-            bgColor: '#3a3637',
-            fgColor: '#ffac00',
+            bgColor: '#ffac00',
+            fgColor: '#3a3637',
             fontColor: 'rgba(255,255,255,0.5)',
             marginTop: 10,
             label: this.track,
