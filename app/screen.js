@@ -40,6 +40,8 @@ var Screen = new Class({
                 click: function() {
                     if (this.clipMatrix.xOffset > 0) {
                         this.clipMatrix.xOffset -= 1;
+                        this.volumePanel.xOffset -= 1;
+                        this.sendPanel.xOffset -= 1;
                     }
                 }.bind(this)
             }
@@ -53,6 +55,8 @@ var Screen = new Class({
                 click: function() {
                     if (this.clipMatrix.xOffset < 56) {
                         this.clipMatrix.xOffset += 1;
+                        this.volumePanel.xOffset += 1;
+                        this.sendPanel.xOffset += 1;
                     }
                 }.bind(this)
             }
@@ -72,6 +76,8 @@ var Screen = new Class({
         this.activePanel = this.clipMatrix;
 
         this.clipMatrix.requestUpdate();
+        this.volumePanel.requestUpdate();
+        this.sendPanel.requestUpdate();
     },
 
     addPanel: function(label, panel) {
@@ -90,6 +96,9 @@ var Screen = new Class({
 
     onClickButton: function(panel) {
         this.activePanel = panel;
+        // if (this.activePanel.requestUpdate) {
+        //     this.activePanel.requestUpdate();
+        // }
     },
 
     hidePanels: function() {

@@ -16,7 +16,7 @@ var Track = new Class({
         this.volume = this.add({
             type: MeterSlider,
             sizeHint: 8,
-            marginTop: 10,
+            marginTop: 5,
             on: {
                 change: function(value) {
                     this.fireEvent('volume', [this.track, value]);
@@ -29,7 +29,7 @@ var Track = new Class({
             bgColor: '#ffac00',
             fgColor: '#3a3637',
             fontColor: 'rgba(255,255,255,0.5)',
-            marginTop: 10,
+            marginTop: 5,
             label: this.track,
             on: {
                 click: function(state) {
@@ -43,7 +43,7 @@ var Track = new Class({
             bgColor: '#3a3637',
             fgColor: '#0b9eff',
             fontColor: 'rgba(255,255,255,0.5)',
-            marginTop: 10,
+            marginTop: 5,
             label: 'S',
             on: {
                 click: function(state) {
@@ -58,7 +58,7 @@ var Track = new Class({
             fgColor: '#ff283f',
             fontColor: 'rgba(255,255,255,0.5)',
             label: 'O',
-            marginTop: 10,
+            marginTop: 5,
             on: {
                 click: function(state) {
                     this.fireEvent('arm', [this.track, state]);

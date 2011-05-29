@@ -59,8 +59,8 @@ var ClipMatrix = new Class({
       
         this.xOffset = 0;
         this.yOffset = 0;
-        this.cols = 16
-        this.rows = 16
+        this.cols = 16;
+        this.rows = 8;
         
         this.matrix = [];
         

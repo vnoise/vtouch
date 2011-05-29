@@ -4,8 +4,6 @@ var TrackPanel = new Class({
     initialize: function(options) {
         Widget.prototype.initialize.call(this, options);
 
-        this.layout = 'horizontal';
-
         if (this.messages.name) {
             this.listen(this.messages.name, this.onLiveName.bind(this))
         }
@@ -16,11 +14,13 @@ var TrackPanel = new Class({
         this.listen(this.messages.solo, this.onLiveSolo.bind(this))
         this.listen(this.messages.arm, this.onLiveArm.bind(this))
 
-        for (var i = 0; i < 8; i++) {
+        this.cols = 16;
+        this.xOffset = 0;
+
+        for (var i = 0; i < this.cols; i++) {
             this.add({
                 type: Track,
                 track: i,
-                marginRight: 10,
                 on: {
                     volume: this.onVolume.bind(this),
                     mute: this.onMute.bind(this),
@@ -29,6 +29,32 @@ var TrackPanel = new Class({
                 }
             });
         }        
+    },
+
+    doLayout: function() {
+        var gap = 5;
+        var w = this.width / 8;
+        var h = this.height;
+
+        this.children.each(function(child) {
+            child.visible = false;
+        });
+
+        for (var x = 0; x < 8; x++) {
+            var child = this.children[x + this.xOffset];            
+            child.visible = true;
+            child.extent(x * w, 0, w - gap, h - gap);
+            child.doLayout();
+        }    
+    },
+
+    requestUpdate: function() {
+        for (var i = 0; i < this.cols; i++) {
+            this.send(this.messages.volume, 'i', i);
+            this.send(this.messages.mute, 'i', i);
+            this.send(this.messages.solo, 'i', i);
+            this.send(this.messages.arm, 'i', i);
+        }
     },
 
     onLiveName: function(track, name){
