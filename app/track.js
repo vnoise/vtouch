@@ -26,8 +26,8 @@ var Track = new Class({
 
         this.mute = this.add({
             type: ToggleButton,
-            bgColor: '#300',
-            fgColor: '#900',
+            bgColor: '#3a3637',
+            fgColor: '#ffac00',
             fontColor: 'rgba(255,255,255,0.5)',
             marginTop: 10,
             label: this.track,
@@ -40,8 +40,8 @@ var Track = new Class({
 
         this.solo = this.add({
             type: ToggleButton,
-            bgColor: '#030',
-            fgColor: '#060',
+            bgColor: '#3a3637',
+            fgColor: '#0b9eff',
             fontColor: 'rgba(255,255,255,0.5)',
             marginTop: 10,
             label: 'S',
@@ -54,8 +54,8 @@ var Track = new Class({
 
         this.arm = this.add({
             type: ToggleButton,
-            bgColor: '#003',
-            fgColor: '#006',
+            bgColor:  '#3a3637',
+            fgColor: '#ff283f',
             fontColor: 'rgba(255,255,255,0.5)',
             label: 'O',
             marginTop: 10,

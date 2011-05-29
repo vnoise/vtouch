@@ -4,7 +4,8 @@ var Clip = new Class({
     initialize: function(options) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
         this._state = 0;
-        this._color = "#003047";
+        this.bgColor = '#3a3637';
+        this._color = '#3a3637';
         this._clipPos = 0;
         this.label = "";
 
@@ -29,7 +30,7 @@ var Clip = new Class({
         this.drawLabel(context);
 
         if (this._state == 2){
-            context.fillStyle = "rgba(255,255,255,0.2)";
+            context.fillStyle = "rgba(255,255,255,0.5)";
             context.fillRect(0, 0, this.width * this._clipPos, this.height);
         }
 
@@ -69,8 +70,8 @@ var ClipMatrix = new Class({
                     track: i,
                     clip: j,
                     fontSize: 8,
-                    bgColor: "#003047",
-                    fgColor: "#FFFF00",
+                    bgColor: "#333033",
+                    fgColor: "#333033",
                     marginRight: 10,
                     label: "",
                     on: {
