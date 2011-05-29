@@ -9,8 +9,8 @@ var Label = new Class({
 
     drawCanvas: function(context) {
         context.fillStyle = this.fontColor;
-        context.font = "20px Helvetica";
-        context.fillText(this.label, 2, this.height / 2);
+        context.font = this.height / 2 + "px " + this.fontName;
+        context.fillText(this.label, 2, this.height * 0.75);
     },
 
     onTouchDown: function(event) {
