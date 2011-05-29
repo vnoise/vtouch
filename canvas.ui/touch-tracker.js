@@ -5,16 +5,16 @@ var TouchTracker = new Class({
         this.touchModel = null;
         this.touches = {};
 
-        if (window.location.hash == '#touch') {
-            if (navigator.userAgent.match(/iPad|iPhone/i)) {
-                this.touchModel = "apple";
-                this.event = {
-                    down: 'touchstart',
-                    move: 'touchmove',
-                    up: 'touchend'
-                };
-            }
-            else if (navigator.userAgent.match(/Firefox/i)) {
+        if (navigator.userAgent.match(/iPad|iPhone/i)) {
+            this.touchModel = "apple";
+            this.event = {
+                down: 'touchstart',
+                move: 'touchmove',
+                up: 'touchend'
+            };
+        }
+        else {
+            if (window.location.hash == '#touch' && navigator.userAgent.match(/Firefox/i)) {
                 document.multitouchData = true;
                 this.touchModel = "mozilla";
                 this.event = {
@@ -24,16 +24,13 @@ var TouchTracker = new Class({
                 };
             }
             else {
-                throw "no touch device found";
+                this.touchModel = "mouse";
+                this.event = {
+                    down: 'mousedown',
+                    move: 'mousemove',
+                    up: 'mouseup'
+                };
             }
-        }
-        else {
-            this.touchModel = "mouse";
-            this.event = {
-                down: 'mousedown',
-                move: 'mousemove',
-                up: 'mouseup'
-            };
         }
 
         // document.documentElement.style.webkitTapHighlightColor = "rgba(0,0,0,0)";

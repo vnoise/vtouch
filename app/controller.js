@@ -21,7 +21,7 @@ var Controller = new Class({
             console.log("warning: args.length != types.length");
         }
 
-        console.log("send: ", arguments);
+        // console.log("send: ", arguments);
 
         this.socket.send(message);
     },
@@ -39,7 +39,7 @@ var Controller = new Class({
             controller: this
         });
 
-        console.log("socket.io connected");
+        // console.log("socket.io connected");
     },
 
     onMessage: function(message) {
@@ -49,7 +49,7 @@ var Controller = new Class({
     },
 
     onDisconnect: function() {
-        console.log('socket.io disconnected');
+        // console.log('socket.io disconnected');
     }
 
 });
