@@ -41,6 +41,12 @@ var Slider = new Class({
         }
     },
 
+    setValueTimed: function(value) {
+        if (this.lastEventTime + 500 < Number(new Date())) {
+            this.value(value);
+        }
+    },
+
     handleEvent: function(event) {    
         var value = this.min + ((this.height - event.localY) / this.height) * (this.max - this.min);
 

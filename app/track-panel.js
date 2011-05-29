@@ -66,9 +66,7 @@ var TrackPanel = new Class({
     },
 
     onLiveVolume: function(track, value) {
-        if (this.children[track].lastEventTime + 200 < Number(new Date())) {
-            this.children[track].volume.value(value);
-        }
+        this.children[track].volume.setValueTimed(value);
     },
 
     onLiveMute: function(track, state) {

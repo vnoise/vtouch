@@ -75,9 +75,7 @@ var SendPanel = new Class({
     },
 
     onLiveSend: function(track, send, value){
-        if (this.matrix[track][send].lastEventTime + 200 < Number(new Date())) {
-            this.matrix[track][send].value(value);
-        }
+        this.matrix[track][send].setValueTimed(value);
     }
 
 });
