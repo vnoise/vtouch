@@ -29,14 +29,20 @@ var Clip = new Class({
         }else{
             context.fillStyle = this._color;
         }
-        
         context.fillRect(0, 0, this.width, this.height);
         context.fillStyle = this.labelColor;
-        context.font = "20px Helvetica";
+        fontSize = this.height/4;
+        context.font = fontSize + "px Helvetica";
         context.fillText(this.label, 2, this.height - this.height/10 , this.width - this.width/10);
         if (this._state == 2){
             context.fillStyle = "rgba(255,255,255,0.5)";
             context.fillRect(0, 0, this.width * this._clipPos, this.height);// Rectangle(pos=pos, size=(w * self.position, h)))
+        }
+        if (this._state == 2 || this._state == 3 ){
+            context.strokeStyle = "rgb(255,255,255)";
+            context.lineWidth = 2
+            context.strokeRect(0+context.lineWidth/2, 0+context.lineWidth/2, 
+                this.width - context.lineWidth, this.height - context.lineWidth);// Rectangle(pos=pos, size=(w * self.position, h)))
         }
     },
 
@@ -94,14 +100,14 @@ var ClipMatrix = new Class({
     doLayout: function() {
         var x = 0;
         var y = 0;
-        var gap = 10;
+        var gap = this.height/50 ;
         var w = this.width/8 ;
         var h = this.height/8 ;
         
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
                 //console.log(x,y)
-                this.matrix[j][i].extent(j*w, i*h, w, h);
+                this.matrix[j][i].extent(j*w, i*h, w-gap, h-gap);
             }
             
         }        
