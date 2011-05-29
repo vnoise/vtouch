@@ -9,8 +9,8 @@ var Slider = new Class({
         this.min = 0;
         this.max = 1;
         this.label = "";
-        this.fgColor = "#ccc";
-        this.bgColor = "#333";
+        this.fgColor = '#0b9eff';
+        this.bgColor = '#3a3637';
 
         Widget.prototype.initialize.call(this, options);
     },
@@ -25,7 +25,7 @@ var Slider = new Class({
         context.fillRect(0, 0, this.width, this.height);
 
         context.fillStyle = this.fgColor;
-        context.fillRect(0, this.handlePos, this.width, this.handleSize);
+        context.fillRect(0, this.handlePos, this.width, this.height-this.handlePos);//*-1);
 
         context.fillStyle = this.fontColor;
         context.font = "20px Helvetica";

@@ -7,8 +7,8 @@ var Button = new Class({
         this.fontColor = "#fff";
         this.fontName = "Arial";
         this.fontSize = 10;
-        this.borderWidth = 2;
-        this.borderColor = "rgba(255,255,255,0.5)";
+        this.borderWidth = 3;
+        this.borderColor = "rgba(255,255,255,1)";
 
         Widget.prototype.initialize.call(this, options);
     },
@@ -28,7 +28,7 @@ var Button = new Class({
     drawLabel: function(context) {
         context.textAlign = this.textAlign;
         context.fillStyle = this.fontColor;
-        context.font = (this.height * this.fontSize / 25) + "px " + this.fontName;
+        context.font = (this.height * this.fontSize / 30) + "px " + this.fontName;
         context.fillText(this.label, this.width / 2, this.height / 2 + this.height * this.fontSize / 100);
     },
 

@@ -11,7 +11,7 @@ var MeterSlider = new Class({
         Slider.prototype.drawCanvas.call(this, context);
 
         context.fillStyle = "rgba(255,255,255,0.5)";
-        context.fillRect(0, this.height, this.width, (this.height * this.meter) * -1);
+        context.fillRect(0, this.height, this.width, (this.height * this.meter)*0.6 * -1);
         
     }
 });
