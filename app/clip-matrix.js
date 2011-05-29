@@ -32,11 +32,18 @@ var Clip = new Class({
         
         context.fillRect(0, 0, this.width, this.height);
         context.fillStyle = this.labelColor;
-        context.font = "20px Helvetica";
+        fontSize = this.height/4;
+        context.font = fontSize + "px Helvetica";
         context.fillText(this.label, 2, this.height - this.height/10 , this.width - this.width/10);
         if (this._state == 2){
             context.fillStyle = "rgba(255,255,255,0.5)";
             context.fillRect(0, 0, this.width * this._clipPos, this.height);// Rectangle(pos=pos, size=(w * self.position, h)))
+        }
+        if (this._state == 2 || this._state == 3 ){
+            context.strokeStyle = "rgb(255,255,255)";
+            context.lineWidth = 2
+            context.strokeRect(0+context.lineWidth/2, 0+context.lineWidth/2, 
+                this.width - context.lineWidth, this.height - context.lineWidth);// Rectangle(pos=pos, size=(w * self.position, h)))
         }
     },
 
