@@ -29,7 +29,6 @@ var Clip = new Class({
         }else{
             context.fillStyle = this._color;
         }
-        
         context.fillRect(0, 0, this.width, this.height);
         context.fillStyle = this.labelColor;
         fontSize = this.height/4;
@@ -101,14 +100,14 @@ var ClipMatrix = new Class({
     doLayout: function() {
         var x = 0;
         var y = 0;
-        var gap = 10;
+        var gap = this.height/50 ;
         var w = this.width/8 ;
         var h = this.height/8 ;
         
         for (var i = 0; i < 8; i++) {
             for (var j = 0; j < 8; j++) {
                 //console.log(x,y)
-                this.matrix[j][i].extent(j*w, i*h, w, h);
+                this.matrix[j][i].extent(j*w, i*h, w-gap, h-gap);
             }
             
         }        
