@@ -2,13 +2,22 @@ var Button = new Class({
     Extends: Widget,
 
     initialize: function(options) {
-        this.label = "";
+        this.label = null;
         this.textAlign = "center";
         this.fontColor = "#fff";
         this.fontName = "Arial";
         this.fontSize = 10;
+        this.borderWidth = 2;
+        this.borderColor = "rgba(255,255,255,0.5)";
 
         Widget.prototype.initialize.call(this, options);
+    },
+
+    drawBorder: function(context) {
+        var w = this.borderWidth / 2;
+        context.strokeStyle = this.borderColor;
+        context.lineWidth = this.borderWidth;
+        context.strokeRect(w, w, this.width - w, this.height - w); 
     },
 
     drawBackground: function(context, style) {
@@ -25,7 +34,14 @@ var Button = new Class({
 
     drawCanvas: function(context) {
         this.drawBackground(context, this.bgColor);
-        this.drawLabel(context);
+
+        if (this.label) {
+            this.drawLabel(context);
+        }
+
+        if (this.borderWidth > 0) {
+            this.drawBorder(context);
+        }
     },
 
     onTouchDown: function(event) {

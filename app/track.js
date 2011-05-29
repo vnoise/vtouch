@@ -9,7 +9,8 @@ var Track = new Class({
         this.label = this.add({
             type: Button,
             label: this.name,
-            bgColor: '#300'         
+            borderWidth: 0,
+            bgColor: '#11'         
         });
 
         this.volume = this.add({

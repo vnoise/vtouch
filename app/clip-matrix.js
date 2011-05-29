@@ -29,15 +29,12 @@ var Clip = new Class({
         this.drawLabel(context);
 
         if (this._state == 2){
-            context.fillStyle = "rgba(255,255,255,0.5)";
-            context.fillRect(0, 0, this.width * this._clipPos, this.height);// Rectangle(pos=pos, size=(w * self.position, h)))
+            context.fillStyle = "rgba(255,255,255,0.2)";
+            context.fillRect(0, 0, this.width * this._clipPos, this.height);
         }
 
         if (this._state == 2 || this._state == 3 ){
-            context.strokeStyle = "rgb(255,255,255)";
-            context.lineWidth = 2
-            context.strokeRect(0+context.lineWidth/2, 0+context.lineWidth/2, 
-                               this.width - context.lineWidth, this.height - context.lineWidth);// Rectangle(pos=pos, size=(w * self.position, h)))
+            this.drawBorder(context);
         }
     },
 
