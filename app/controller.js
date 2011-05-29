@@ -21,9 +21,10 @@ var Controller = new Class({
             console.log("warning: args.length != types.length");
         }
 
-        // console.log("send: ", arguments);
-
-        this.socket.send(message);
+        var socket = this.socket;
+        setTimeout(function() {
+            socket.send(message);
+        }, 1);
     },
 
     connect: function() {
