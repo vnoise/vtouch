@@ -75,6 +75,10 @@ var Screen = new Class({
 
         this.activePanel = this.clipMatrix;
 
+        for (var i = 0; i < 16; i++) {
+            this.send('/live/name/track', 'i', i);
+        }
+
         this.clipMatrix.requestUpdate();
         this.volumePanel.requestUpdate();
         this.sendPanel.requestUpdate();

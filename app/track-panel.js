@@ -58,7 +58,7 @@ var TrackPanel = new Class({
     },
 
     onLiveName: function(track, name){
-        this.children[track].name = name;
+        this.children[track].name.label = name;
     },
 
     onLiveMeter: function(track, pan, value){
@@ -78,7 +78,6 @@ var TrackPanel = new Class({
     },
 
     onLiveArm: function(track, state) {
-        console.log("onLiveÁrm ->", track, state)
         this.children[track].arm.state = state;
     },
 

@@ -46,8 +46,8 @@ var SendPanel = new Class({
     doLayout: function() {
         var gap = 5;
         var w = this.width / 8;
-        var h = this.height * 0.4;
-        var top = this.height * 0.2;
+        var h = this.height * 0.8 / 2;
+        var top = this.height * 0.1;
 
         this.children.each(function(child) {
             child.visible = false;
@@ -71,7 +71,7 @@ var SendPanel = new Class({
     },
 
     onLiveName: function(track, name){
-        this.labels[track].name = name;
+        this.names[track].label = name;
     },
 
     onLiveSend: function(track, send, value){

@@ -53,6 +53,7 @@ var ClipMatrix = new Class({
     initialize: function(options) {
         Widget.prototype.initialize.call(this, options);
 
+        this.listen('/live/name/track', this.onLiveName.bind(this));
         this.listen("/live/clip/info", this.onClipInfo.bind(this));
         this.listen("/live/name/clip", this.onClipName.bind(this));
         this.listen("/live/clip/position", this.onClipPosition.bind(this))
@@ -62,10 +63,16 @@ var ClipMatrix = new Class({
         this.cols = 16;
         this.rows = 8;
         
+        this.names = [];
         this.matrix = [];
         
         for (var x = 0; x < this.cols; x++) {
             this.matrix[x] = [];
+            this.names[x] = this.add({
+                type: Button,
+                borderWidth: 0,
+                bgColor: '#11'
+            });
             for (var y = 0; y < this.rows; y++) {
                 this.matrix[x][y] = this.add({
                     type: Clip,
@@ -88,15 +95,20 @@ var ClipMatrix = new Class({
         var gap = 5;
         var w = this.width / 8;
         var h = this.height / 8;
+        var top = this.height * 0.1;
 
         this.children.each(function(child) {
             child.visible = false;
         });
         
         for (var x = 0; x < 8; x++) {
+            var label = this.names[x + this.xOffset];
+            label.extent(x * w, 0, w - gap, top - gap);
+            label.visible = true;
+
             for (var y = 0; y < 8; y++) {
                 var child = this.matrix[x + this.xOffset][y + this.yOffset];
-                child.extent(x * w, y * h, w - gap, h - gap);
+                child.extent(x * w, y * h + top, w - gap, h - gap);
                 child.visible = true;
             }
         }    
@@ -117,6 +129,10 @@ var ClipMatrix = new Class({
     onClipInfo: function(track, clip, state) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
         this.matrix[track][clip].clipInfo(state);
+    },
+
+    onLiveName: function(track, name){
+        this.names[track].label = name;
     },
     
     requestUpdate: function() {   

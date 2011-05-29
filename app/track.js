@@ -6,16 +6,15 @@ var Track = new Class({
 
         this.layout = 'vertical';
 
-        this.label = this.add({
+        this.name = this.add({
             type: Button,
-            label: this.name,
             borderWidth: 0,
             bgColor: '#11'         
         });
 
         this.volume = this.add({
             type: MeterSlider,
-            sizeHint: 8,
+            sizeHint: 7,
             marginTop: 5,
             on: {
                 change: function(value) {
