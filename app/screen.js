@@ -58,12 +58,16 @@ var Screen = new Class({
             }
         });
 
-        this.clipMatrix = this.add({ type: ClipMatrix});
+        this.clipMatrix = this.add({ type: ClipMatrix, active: true });
         this.volumePanel = this.add({ type: VolumePanel });        
+        this.sendPanel = this.add({ type: SendPanel });        
+        this.returnPanel = this.add({ type: ReturnPanel });        
 
         this.panels = [];
         this.addPanel("Clip", this.clipMatrix);
         this.addPanel("Volume", this.volumePanel);
+        this.addPanel("Sends", this.sendPanel);
+        this.addPanel("Returns", this.returnPanel);
 
         this.activePanel = this.clipMatrix;
 
@@ -95,9 +99,10 @@ var Screen = new Class({
     },      
 
     doLayout: function() {
-        this.tabs.extent(0, 0, this.width, this.height * 0.1);
+        this.tabs.extent(0, 0, this.width, this.height * 0.1 - 5);
         this.tabs.doLayout();
-        this.navi.extent(0, this.height * 0.1, this.width * 0.1, this.height * 0.9);
+
+        this.navi.extent(0, this.height * 0.1 - 5, this.width * 0.1 - 5, this.height * 0.9);
         this.navi.doLayout();
 
         this.hidePanels();

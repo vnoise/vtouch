@@ -15,7 +15,7 @@ var Track = new Class({
 
         this.volume = this.add({
             type: MeterSlider,
-            sizeHint: 4,
+            sizeHint: 8,
             marginTop: 10,
             on: {
                 change: function(value) {

@@ -133,9 +133,7 @@ var Widget = new Class({
 
         document.body.appendChild(this.canvas);
 
-        setTimeout(function() {
-            setInterval(this.draw.bind(this), 50);
-        }.bind(this), 100);
+        setInterval(this.draw.bind(this), 50);
     },
 
     drawCanvas: function(context) {

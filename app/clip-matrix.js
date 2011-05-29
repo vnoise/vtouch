@@ -96,7 +96,7 @@ var ClipMatrix = new Class({
         for (var x = 0; x < 8; x++) {
             for (var y = 0; y < 8; y++) {
                 var child = this.matrix[x + this.xOffset][y + this.yOffset];
-                child.extent(x * w + gap , y * h + gap, w - gap, h - gap);
+                child.extent(x * w, y * h, w - gap, h - gap);
                 child.visible = true;
             }
         }    
