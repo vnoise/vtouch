@@ -56,18 +56,20 @@ var ClipMatrix = new Class({
         this.listen("/live/name/clip", this.onClipName.bind(this));
         this.listen("/live/clip/position", this.onClipPosition.bind(this))
       
-        this._xNavOffset = 0;
-        this._yNavOffset = 0;
+        this.xOffset = 0;
+        this.yOffset = 0;
+        this.cols = 16
+        this.rows = 16
         
         this.matrix = [];
         
-        for (var i = 0; i < 8; i++) {
-            this.matrix[i] = [];
-            for (var j = 0; j < 8; j++) {
-                this.matrix[i][j] = this.add({
+        for (var x = 0; x < this.cols; x++) {
+            this.matrix[x] = [];
+            for (var y = 0; y < this.rows; y++) {
+                this.matrix[x][y] = this.add({
                     type: Clip,
-                    track: i,
-                    clip: j,
+                    track: x,
+                    clip: y,
                     fontSize: 8,
                     bgColor: "#003047",
                     fgColor: "#FFFF00",
@@ -80,68 +82,52 @@ var ClipMatrix = new Class({
             }        
         }
     },
-    
-    setNavOffsetX: function(offset){
-        this._xNavOffset = offset;
-    },
-    
-    setNavOffsetY: function(offset){
-        this._yNavOffset = offset;
-    },
-    
+
     doLayout: function() {
-        var x = 0;
-        var y = 0;
-        var gap = this.height/50 ;
-        var w = this.width/8 ;
-        var h = this.height/8 ;
+        var gap = 5;
+        var w = this.width / 8;
+        var h = this.height / 8;
+
+        this.children.each(function(child) {
+            child.visible = false;
+        });
         
-        for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < 8; j++) {
-                //console.log(x,y)
-                this.matrix[j][i].extent(j*w, i*h, w-gap, h-gap);
+        for (var x = 0; x < 8; x++) {
+            for (var y = 0; y < 8; y++) {
+                var child = this.matrix[x + this.xOffset][y + this.yOffset];
+                child.extent(x * w + gap , y * h + gap, w - gap, h - gap);
+                child.visible = true;
             }
-            
-        }        
+        }    
     },
     
     onClipPosition: function(track, clip, position, length, loop_start,loop_end){
-        this.matrix[this.getTrack(track)][this.getClip(clip)].clipPos( position / length);
+        this.matrix[track][clip].clipPos(position / length);
     },
     
     onClipName: function(track, clip, name,color) {
-        r = (color >> 16) & 0xff;// / 255;
+        r = (color >> 16) & 0xff;
         g = (color >> 8) & 0xff;
         b = (color >> 0) & 0xff;
         color =  "rgb("+r+","+g+","+b+")";
-        this.matrix[this.getTrack(track)][this.getClip(clip)].clipName(name,color);
-    },
-    
-    getTrack: function(track){
-        return track - this._xNavOffset;
-    },
-    
-    getClip: function(clip){
-        return clip - this._yNavOffset;
+        this.matrix[track][clip].clipName(name,color);
     },
         
     onClipInfo: function(track, clip, state) {
         //[state: 0 = no clip, 1 = has clip, 2 = playing, 3 = triggered]
-        this.matrix[this.getTrack(track)][this.getClip(clip)].clipInfo(state);
+        this.matrix[track][clip].clipInfo(state);
     },
     
-    requestUpdate: function()
-    {   
-       for (var i = 0; i < 8; i++) {
-            for (var j = 0; j < 8; j++) {
-                this.send("/live/clip/info", "ii", i + this._xNavOffset, j + this._yNavOffset );
-                this.send("/live/name/clip", "ii", i + this._xNavOffset, j + this._yNavOffset );
+    requestUpdate: function() {   
+        for (var x = 0; x < this.cols; x++) {
+            for (var y = 0; y < this.rows; y++) {
+                this.send("/live/clip/info", "ii", x, y);
+                this.send("/live/name/clip", "ii", x, y);
             }
        }
     },
 
     onClick: function(track, clip, state) {
-        //debugger;
         this.send("/live/play/clipslot", "ii", track, clip) ; 
         
     }
