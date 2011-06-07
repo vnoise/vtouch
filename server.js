@@ -7,15 +7,6 @@ var osc    = require('./node-osc/lib/osc');
 var _osc   = require('./osc/osc');
 
 
-Function.prototype.bind = function(object) {
-    var fn = this;
-    var args = Array.prototype.slice.call(arguments, 1);
-    return function() {
-        return fn.apply(object, args.concat(Array.prototype.slice.call(arguments, 0)));
-    };
-};
-
-
 function index(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     fs.readFile("index.html", function(err, file) {
