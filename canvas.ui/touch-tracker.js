@@ -118,7 +118,7 @@ var TouchTracker = new Class({
             event.preventDefault();
         }
 
-        if (!event.streamId === undefined) {
+        if (event.streamId !== undefined) {
             event.identifier = event.streamId;
         }
 

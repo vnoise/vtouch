@@ -27,9 +27,9 @@ var Slider = new Class({
         context.fillStyle = this.fgColor;
         context.fillRect(0, this.handlePos, this.width, this.height-this.handlePos);//*-1);
 
-        context.fillStyle = this.fontColor;
-        context.font = "20px Helvetica";
-        context.fillText(this.label, 2, this.height - 40, this.width - 20)
+        // context.fillStyle = this.fontColor;
+        // context.font = "20px Helvetica";
+        // context.fillText(this.label, 2, this.height - 40, this.width - 20)
     },
 
     value: function(value) {
@@ -50,7 +50,7 @@ var Slider = new Class({
     handleEvent: function(event) {    
         var value = this.min + ((this.height - event.localY) / this.height) * (this.max - this.min);
 
-        if (Math.abs(value - this._value) > 0.01) {
+        if (Math.abs(value - this._value) > 0.001) {
             this.lastEventTime = Number(new Date());
             this.value(value);
             this.fireEvent("change", this._value);

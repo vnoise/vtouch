@@ -62,29 +62,22 @@ var Screen = new Class({
             }
         });
 
-        this.clipMatrix = this.add({ type: ClipMatrix, active: true });
-        this.volumePanel = this.add({ type: VolumePanel });        
-        this.sendPanel = this.add({ type: SendPanel });        
-        this.returnPanel = this.add({ type: ReturnPanel });        
-
         this.panels = [];
-        this.addPanel("Clip", this.clipMatrix);
-        this.addPanel("Volume", this.volumePanel);
-        this.addPanel("Sends", this.sendPanel);
-        this.addPanel("Returns", this.returnPanel);
+        this.clipMatrix         = this.addPanel("Clip", { type: ClipMatrix });
+        this.volumePanel        = this.addPanel("Volume", { type: VolumePanel });        
+        this.sendPanel          = this.addPanel("Send", { type: SendPanel });        
+        this.returnPanel        = this.addPanel("Return", { type: ReturnPanel });        
 
-        this.activePanel = this.clipMatrix;
+        this.activePanel = this.panels[0];
+        this.tabs.children[0].active = true;
 
         for (var i = 0; i < 16; i++) {
             this.send('/live/name/track', 'i', i);
         }
-
-        this.clipMatrix.requestUpdate();
-        this.volumePanel.requestUpdate();
-        this.sendPanel.requestUpdate();
     },
 
-    addPanel: function(label, panel) {
+    addPanel: function(label, config) {
+        var panel = this.add(config);
         this.panels.push(panel);
         this.tabs.add({
             type: ScreenButton,
@@ -96,13 +89,11 @@ var Screen = new Class({
                 click: this.onClickButton.bind(this, panel)
             }
         });
+        panel.requestUpdate();
     },
 
     onClickButton: function(panel) {
         this.activePanel = panel;
-        // if (this.activePanel.requestUpdate) {
-        //     this.activePanel.requestUpdate();
-        // }
     },
 
     hidePanels: function() {
