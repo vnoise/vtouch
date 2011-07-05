@@ -140,8 +140,8 @@ class OSCEndpoint:
         self.sendMessage(oscMessage)
 
     def sendMessage(self, message):
-        log ("self.remoteAddr-->"+str(self.remoteAddr))
-        log("-->message--"+str(OSC.decodeOSC(message.getBinary())))
+        #log ("self.remoteAddr-->"+str(self.remoteAddr))
+        #log("-->message--"+str(OSC.decodeOSC(message.getBinary())))
         self.socket.sendto(message.getBinary(), self.remoteAddr)
 
     def processIncomingUDP(self):
@@ -207,7 +207,7 @@ class OSCEndpoint:
                         self.callbackManager.handle(self.data, self.addr)
                 
                 except:
-                    log('/remix/error/' + str(self.data)+'---'+str(self.addr))
+                    #log('/remix/error/' + str(self.data)+'---'+str(self.addr))
                     self.send('/remix/error', (str(sys.exc_info())))
 
         except Exception, e:
