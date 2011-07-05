@@ -7,6 +7,7 @@ var Button = new Class({
         this.fontColor = "#fff";
         this.fontName = "Arial";
         this.fontSize = 10;
+        this.bgColor = "#666";
         this.borderWidth = 3;
         this.borderColor = "rgba(255,255,255,1)";
 

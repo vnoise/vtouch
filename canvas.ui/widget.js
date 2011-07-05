@@ -129,11 +129,15 @@ var Widget = new Class({
 
     initCanvas: function() {
         this.canvas = document.createElement('canvas');
+        this.canvas.setAttribute("width", window.innerWidth);
+        this.canvas.setAttribute("height", window.innerHeight);
         this.touchtracker = new TouchTracker(this);
 
         document.body.appendChild(this.canvas);
 
-        setInterval(this.draw.bind(this), 100);
+        setInterval(function() {
+            this.draw()     
+        }.bind(this), 50);
     },
 
     drawCanvas: function(context) {
@@ -144,7 +148,16 @@ var Widget = new Class({
             return;
         }
 
-        if (context === undefined) {
+        if (context) {
+            context.save();
+            context.translate(this.x, this.y);
+
+            this.drawCanvas(context);
+            this.drawChildren(context);
+
+            context.restore();
+        }
+        else {
             this.canvas.setAttribute("width", window.innerWidth);
             this.canvas.setAttribute("height", window.innerHeight);
             this.width = window.innerWidth;
@@ -155,15 +168,6 @@ var Widget = new Class({
             context.clearRect(0, 0, this.width, this.height);
 
             this.drawChildren(context);
-        }
-        else {
-            context.save();
-            context.translate(this.x, this.y);
-
-            this.drawCanvas(context);
-            this.drawChildren(context);
-
-            context.restore();
         }
     },
 
