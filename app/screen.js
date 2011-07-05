@@ -38,6 +38,9 @@ var Screen = new Class({
             marginTop: 5,
             on: {
                 click: function() {
+                    //debugger;
+                    console.log("sd");
+                    console.log(this.clipMatrix);
                     if (this.clipMatrix.xOffset > 0) {
                         this.clipMatrix.xOffset -= 1;
                         this.volumePanel.xOffset -= 1;
@@ -53,6 +56,9 @@ var Screen = new Class({
             marginTop: 5,
             on: {
                 click: function() {
+                    //debugger;
+                    console.log("sd");
+                    console.log(this.clipMatrix);
                     if (this.clipMatrix.xOffset < 56) {
                         this.clipMatrix.xOffset += 1;
                         this.volumePanel.xOffset += 1;
@@ -68,11 +74,12 @@ var Screen = new Class({
         //this.push(this.volumePanel);
         
         
-        this.clipMatrix = this.add({ type: ClipMatrix });
-        this.volumePanel = this.add({ type: VolumePanel });        
+        /*this.clipMatrix = this.add({ type: ClipMatrix });
+        #this.volumePanel = this.add({ type: VolumePanel });        
         this.sendPanel = this.add({ type: SendPanel });        
         this.returnPanel = this.add({ type: ReturnPanel }); 
-        
+        debugger;
+        */
         /*this.mainView = this.add({ type: MainView, active: true });
         this.mainView.addPanel(this.clipMatrix);
         this.mainView.addPanel(this.volumePanel);
@@ -115,6 +122,7 @@ var Screen = new Class({
             }
         });
         panel.requestUpdate();
+        return panel;
     },
 
     onClickButton: function(panel) {
