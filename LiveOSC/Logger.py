@@ -25,14 +25,12 @@ class Logger:
             try:
                 self.socket.connect(("localhost", 4444))
                 self.connected = 1
+                self.stderr = sys.stderr
+                sys.stderr = self
             except:
                 print "Couldn't connect socket"
-                
 
-        self.errorLog = open("C:\\stderr.txt", "w")
-        self.errorLog.write("Starting Error Log")
-        sys.stderr = self
-                
+        self.buf = ""
 
     def log(self,msg):
         if self.connected:
@@ -42,15 +40,29 @@ class Logger:
         
     def send(self,msg):
         if self.connected:
-            self.socket.send(msg + "\n")
+            self.socket.send(msg)
     
     def close(self):
         if self.connected:
             self.socket.send("Closing..")
             self.socket.close()
             
-        self.errorLog.close()
-            
     def write(self, msg):
-        self.errorLog.write(msg)
-        self.send("STDERR: " + msg)
+        self.stderr.write(msg)
+        self.buf = self.buf + msg
+        lines = self.buf.split("\n", 2)
+        if len(lines) == 2:
+            self.send("STDERR: " + lines[0] + "\n")
+            self.buf = lines[1]
+
+logger = Logger()
+
+def log(*args):
+    text = ''
+    for arg in args:
+        if text != '':
+            text = text + ' '
+        text = text + str(arg)
+    if logger != None:
+        logger.log(text)
+

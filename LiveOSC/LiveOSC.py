@@ -32,14 +32,12 @@ import LiveOSCCallbacks
 import RemixNet
 import OSC
 import LiveUtils
-from Logger import Logger
+import sys
+from Logger import log
 
 class LiveOSC:
     __module__ = __name__
     __doc__ = "Main class that establishes the LiveOSC Component"
-    
-    # Enable Logging
-    _LOG = 0
     
     prlisten = {}
     plisten = {}
@@ -62,11 +60,10 @@ class LiveOSC:
         self._LiveOSC__c_instance = c_instance
       
         self.basicAPI = 0       
-        self.oscServer = RemixNet.OSCServer('localhost')
-        self.oscServer.sendOSC('/remix/oscserver/startup', 1)
+        self.oscEndpoint = RemixNet.OSCEndpoint()
+        self.oscEndpoint.send('/remix/oscserver/startup', 1)
         
-        self.logger = self._LOG and Logger() or 0
-        self.log("Logging Enabled")
+        log("LiveOSC initialized")
         
         # Visible tracks listener
         if self.song().visible_tracks_has_listener(self.refresh_state) != 1:
@@ -115,31 +112,41 @@ class LiveOSC:
             # Since this method is called every 100ms regardless of the song time
             # changing, we use both methods for processing incoming UDP requests
             # so that from a resting state you can initiate play/clip triggering.
-            
+
             try:
+                log('start');
                 doc = self.song()
             except:
+                log('could not get song handle')
                 return
             try:
-                self.basicAPI = LiveOSCCallbacks.LiveOSCCallbacks(self._LiveOSC__c_instance, self.oscServer)
+                self.basicAPI = LiveOSCCallbacks.LiveOSCCallbacks(self._LiveOSC__c_instance, self.oscEndpoint)
                 # Commented for stability
-                #doc.add_current_song_time_listener(self.oscServer.processIncomingUDP)
-                self.oscServer.sendOSC('/remix/echo', 'basicAPI setup complete')
+                self.time = 0
+                doc.add_current_song_time_listener(self.current_song_time_changed)
             except:
+                self.oscEndpoint.send('/remix/echo', 'setting up basicAPI failed')
+                log('setting up basicAPI failed');
                 return
             
             # If our OSC server is listening, try processing incoming requests.
             # Any 'play' initiation will trigger the current_song_time listener
             # and bump updates from 100ms to 60ms.
             
-        if self.oscServer:
+        if self.oscEndpoint:
             try:
-                self.oscServer.processIncomingUDP()
+                self.oscEndpoint.processIncomingUDP()
             except:
-                pass
+                log('error processing incoming UDP packets:', sys.exc_info());
             
         # END OSC LISTENER SETUP
         ######################################################
+
+    def current_song_time_changed(self):
+        time = self.song().current_song_time
+        if int(time) != self.time:
+            self.time = int(time)
+            self.oscEndpoint.send("/live/beat", self.time)
 
     def send_midi(self, midi_event_bytes):
         """
@@ -161,15 +168,12 @@ class LiveOSC:
         return ''
 
     def __handle_display_switch_ids(self, switch_id, value):
-        pass
+	pass
     
     
 ######################################################################
 # Useful Methods
 
-    def getOSCServer(self):
-        return self.oscServer
-    
     def application(self):
         """returns a reference to the application that we are running in"""
         return Live.Application.get_application()
@@ -181,9 +185,6 @@ class LiveOSC:
     def handle(self):
         """returns a handle to the c_interface that is needed when forwarding MIDI events via the MIDI map"""
         return self._LiveOSC__c_instance.handle()
-    def log(self, msg):
-        if self._LOG == 1:
-            self.logger.log(msg) 
             
     def getslots(self):
         tracks = self.song().visible_tracks
@@ -199,7 +200,7 @@ class LiveOSC:
         
         for track in range(0, blocksize):
             block.extend([str(tracks[trackOffset+track].name)])                            
-        self.oscServer.sendOSC("/live/name/trackblock", block)        
+        self.oscEndpoint.send("/live/name/trackblock", block)        
 
 ######################################################################
 # Used Ableton Methods
@@ -216,8 +217,8 @@ class LiveOSC:
         
         self.song().remove_visible_tracks_listener(self.refresh_state)
         
-        self.oscServer.sendOSC('/remix/oscserver/shutdown', 1)
-        self.oscServer.shutdown()
+        self.oscEndpoint.send('/remix/oscserver/shutdown', 1)
+        self.oscEndpoint.shutdown()
             
     def build_midi_map(self, midi_map_handle):
         self.refresh_state()            
@@ -234,16 +235,28 @@ class LiveOSC:
 
         trackNumber = 0
         clipNumber = 0
+        
+        #bundle = OSC.OSCBundle()
+        log("create Bundle")
         for track in self.song().visible_tracks:
-            self.oscServer.sendOSC("/live/name/track", (trackNumber, str(track.name)))
+            bundle = OSC.OSCBundle()
+            bundle.append("/live/name/track/", (trackNumber, str(track.name)))
             
             for clipSlot in track.clip_slots:
                 if clipSlot.clip != None:
-                    self.oscServer.sendOSC("/live/name/clip", (trackNumber, clipNumber, str(clipSlot.clip.name), clipSlot.clip.color))
+                    bundle.append("/live/name/clip/", (trackNumber, clipNumber, str(clipSlot.clip.name), clipSlot.clip.color))
                 clipNumber = clipNumber + 1
+                #if clipNumber >= 8:
+                #    break
             clipNumber = 0
             trackNumber = trackNumber + 1
+            self.oscEndpoint.sendMessage(bundle)
+            
+            #if trackNumber >= 8:
+            #    break
 
+        #self.oscEndpoint.sendMessage(bundle)
+        
         self.trBlock(0, len(self.song().visible_tracks))
 
 ######################################################################
@@ -276,7 +289,7 @@ class LiveOSC:
                 
         if selected_index != self.track:
             self.track = selected_index
-            self.oscServer.sendOSC("/live/track", (selected_index))
+            self.oscEndpoint.send("/live/track", (selected_index))
 
     def scene_change(self):
         selected_scene = self.song().view.selected_scene
@@ -290,8 +303,8 @@ class LiveOSC:
                 
         if selected_index != self.scene:
             self.scene = selected_index
-            self.oscServer.sendOSC("/live/scene", (selected_index))
-    
+            self.oscEndpoint.send("/live/scene", (selected_index))
+	
     def add_tempo_listener(self):
         self.rem_tempo_listener()
     
@@ -305,8 +318,8 @@ class LiveOSC:
     
     def tempo_change(self):
         tempo = LiveUtils.getTempo()
-        self.oscServer.sendOSC("/live/tempo", (tempo))
-    
+        self.oscEndpoint.send("/live/tempo", (tempo))
+	
     def add_transport_listener(self):
         if self.song().is_playing_has_listener(self.transport_change) != 1:
             self.song().add_is_playing_listener(self.transport_change)
@@ -316,22 +329,22 @@ class LiveOSC:
             self.song().remove_is_playing_listener(self.transport_change)    
     
     def transport_change(self):
-        self.oscServer.sendOSC("/live/play", (self.song().is_playing and 2 or 1))
+        self.oscEndpoint.send("/live/play", (self.song().is_playing and 2 or 1))
     
     def add_overdub_listener(self):
         self.rem_overdub_listener()
     
         if self.song().overdub_has_listener(self.overdub_change) != 1:
             self.song().add_overdub_listener(self.overdub_change)
-        
+	    
     def rem_overdub_listener(self):
         if self.song().overdub_has_listener(self.overdub_change) == 1:
             self.song().remove_overdub_listener(self.overdub_change)
-        
+	    
     def overdub_change(self):
         overdub = LiveUtils.getSong().overdub
-        self.oscServer.sendOSC("/live/overdub", (int(overdub) + 1))
-    
+        self.oscEndpoint.send("/live/overdub", (int(overdub) + 1))
+	
     def add_tracks_listener(self):
         self.rem_tracks_listener()
     
@@ -343,11 +356,9 @@ class LiveOSC:
             self.song().remove_tracks_listener(self.tracks_change)
     
     def tracks_change(self):
-        self.oscServer.sendOSC("/live/refresh", (1))
+        self.oscEndpoint.send("/live/refresh", (1))
 
     def rem_clip_listeners(self):
-        self.log("** Remove Listeners **")
-    
         for slot in self.slisten:
             if slot != None:
                 if slot.has_clip_has_listener(self.slisten[slot]) == 1:
@@ -392,7 +403,7 @@ class LiveOSC:
                 c = tracks[track][clip]
                 if c.clip != None:
                     self.add_cliplistener(c.clip, track, clip)
-                    self.log("ClipLauncher: added clip listener tr: " + str(track) + " clip: " + str(clip));
+                    log("ClipLauncher: added clip listener tr: " + str(track) + " clip: " + str(clip));
                 
                 self.add_slotlistener(c, track, clip)
         
@@ -683,12 +694,12 @@ class LiveOSC:
         
     # Clip Callbacks
     def clip_name(self, clip, tid, cid):
-        self.oscServer.sendOSC('/live/name/clip', (tid, cid, str(clip.name), clip.color))
+        self.oscEndpoint.send('/live/name/clip', (tid, cid, str(clip.name), clip.color))
     
     def clip_position(self, clip, tid, cid):
         if self.check_md(1):
             if clip.is_playing:
-                self.oscServer.sendOSC('/live/clip/position', (tid, cid, clip.playing_position, clip.length, clip.loop_start, clip.loop_end))
+                self.oscEndpoint.send('/live/clip/position', (tid, cid, clip.playing_position, clip.length, clip.loop_start, clip.loop_end))
     
     def slot_changestate(self, slot, tid, cid):
         tmptrack = LiveUtils.getTrack(tid)
@@ -707,8 +718,8 @@ class LiveOSC:
             
             length =  slot.clip.loop_end - slot.clip.loop_start
             
-            self.oscServer.sendOSC('/live/track/info', (tid, armed, cid, playing, length))
-            self.oscServer.sendOSC('/live/name/clip', (tid, cid, str(slot.clip.name), slot.clip.color))
+            self.oscEndpoint.send('/live/track/info', (tid, armed, cid, playing, length))
+            self.oscEndpoint.send('/live/name/clip', (tid, cid, str(slot.clip.name), slot.clip.color))
         else:
             if self.clisten.has_key(slot.clip) == 1:
                 slot.clip.remove_playing_status_listener(self.clisten[slot.clip])
@@ -722,13 +733,13 @@ class LiveOSC:
             if self.cclisten.has_key(slot.clip) == 1:
                 slot.clip.remove_color_listener(self.cclisten[slot.clip])
             
-            self.oscServer.sendOSC('/live/track/info', (tid, armed, cid, 0, 0.0))
-            self.oscServer.sendOSC('/live/clip/info', (tid, cid, 0))
+            self.oscEndpoint.send('/live/track/info', (tid, armed, cid, 0, 0.0))
+            self.oscEndpoint.send('/live/clip/info', (tid, cid, 0))
                 
-        #self.log("Slot changed" + str(self.clips[tid][cid]))
+        #log("Slot changed" + str(self.clips[tid][cid]))
     
     def clip_changestate(self, clip, x, y):
-        self.log("Listener: x: " + str(x) + " y: " + str(y));
+        log("Listener: x: " + str(x) + " y: " + str(y));
 
         playing = 1
         
@@ -738,9 +749,9 @@ class LiveOSC:
         if clip.is_triggered == 1:
             playing = 3
             
-        self.oscServer.sendOSC('/live/clip/info', (x, y, playing))
+        self.oscEndpoint.send('/live/clip/info', (x, y, playing))
         
-        #self.log("Clip changed x:" + str(x) + " y:" + str(y) + " status:" + str(playing)) 
+        #log("Clip changed x:" + str(x) + " y:" + str(y) + " status:" + str(playing)) 
         
         
     # Mixer Callbacks
@@ -749,35 +760,35 @@ class LiveOSC:
         types = { "panning": "pan", "volume": "volume", "crossfader": "crossfader" }
         
         if r == 2:
-            self.oscServer.sendOSC('/live/master/' + types[type], (float(val)))
+            self.oscEndpoint.send('/live/master/' + types[type], (float(val)))
         elif r == 1:
-            self.oscServer.sendOSC('/live/return/' + types[type], (tid, float(val)))
+            self.oscEndpoint.send('/live/return/' + types[type], (tid, float(val)))
         else:
-            self.oscServer.sendOSC('/live/' + types[type], (tid, float(val)))        
+            self.oscEndpoint.send('/live/' + types[type], (tid, float(val)))        
         
     def mixert_changestate(self, type, tid, track, r = 0):
         val = eval("track." + type)
         
         if r == 1:
-            self.oscServer.sendOSC('/live/return/' + type, (tid, int(val)))
+            self.oscEndpoint.send('/live/return/' + type, (tid, int(val)))
         else:
-            self.oscServer.sendOSC('/live/' + type, (tid, int(val)))        
+            self.oscEndpoint.send('/live/' + type, (tid, int(val)))        
     
     def send_changestate(self, tid, track, sid, send, r = 0):
         val = send.value
         
         if r == 1:
-            self.oscServer.sendOSC('/live/return/send', (tid, sid, float(val)))   
+            self.oscEndpoint.send('/live/return/send', (tid, sid, float(val)))   
         else:
-            self.oscServer.sendOSC('/live/send', (tid, sid, float(val)))   
+            self.oscEndpoint.send('/live/send', (tid, sid, float(val)))   
 
 
     # Track name changestate
     def trname_changestate(self, tid, track, r = 0):
         if r == 1:
-            self.oscServer.sendOSC('/live/name/return', (tid, str(track.name)))
+            self.oscEndpoint.send('/live/name/return', (tid, str(track.name)))
         else:
-            self.oscServer.sendOSC('/live/name/track', (tid, str(track.name)))
+            self.oscEndpoint.send('/live/name/track', (tid, str(track.name)))
             self.trBlock(0, len(LiveUtils.getTracks()))
             
     # Meter Changestate
@@ -785,21 +796,21 @@ class LiveOSC:
         if r == 2:
             if self.check_md(2):
                 if lr == 0:
-                    self.oscServer.sendOSC('/live/master/meter', (0, float(track.output_meter_left)))
+                    self.oscEndpoint.send('/live/master/meter', (0, float(track.output_meter_left)))
                 else:
-                    self.oscServer.sendOSC('/live/master/meter', (1, float(track.output_meter_right)))
+                    self.oscEndpoint.send('/live/master/meter', (1, float(track.output_meter_right)))
         elif r == 1:
             if self.check_md(3):
                 if lr == 0:
-                    self.oscServer.sendOSC('/live/return/meter', (tid, 0, float(track.output_meter_left)))
+                    self.oscEndpoint.send('/live/return/meter', (tid, 0, float(track.output_meter_left)))
                 else:
-                    self.oscServer.sendOSC('/live/return/meter', (tid, 1, float(track.output_meter_right)))        
+                    self.oscEndpoint.send('/live/return/meter', (tid, 1, float(track.output_meter_right)))        
         else:
             if self.check_md(4):
                 if lr == 0:
-                    self.oscServer.sendOSC('/live/track/meter', (tid, 0, float(track.output_meter_left)))
+                    self.oscEndpoint.send('/live/track/meter', (tid, 0, float(track.output_meter_left)))
                 else:
-                    self.oscServer.sendOSC('/live/track/meter', (tid, 1, float(track.output_meter_right)))
+                    self.oscEndpoint.send('/live/track/meter', (tid, 1, float(track.output_meter_right)))
     
     def check_md(self, param):
         devices = self.song().master_track.devices
@@ -877,11 +888,11 @@ class LiveOSC:
             
     def param_changestate(self, param, tid, did, pid, type):
         if type == 2:
-            self.oscServer.sendOSC('/live/master/device/param', (did, pid, param.value, str(param.name)))
+            self.oscEndpoint.send('/live/master/device/param', (did, pid, param.value, str(param.name)))
         elif type == 1:
-            self.oscServer.sendOSC('/live/return/device/param', (tid, did, pid, param.value, str(param.name)))
+            self.oscEndpoint.send('/live/return/device/param', (tid, did, pid, param.value, str(param.name)))
         else:
-            self.oscServer.sendOSC('/live/device/param', (tid, did, pid, param.value, str(param.name)))
+            self.oscEndpoint.send('/live/device/param', (tid, did, pid, param.value, str(param.name)))
         
     def add_devicelistener(self, track, tid, type):
         cb = lambda :self.device_changestate(track, tid, type)
@@ -894,11 +905,11 @@ class LiveOSC:
         did = self.tuple_idx(track.devices, track.view.selected_device)
         
         if type == 2:
-            self.oscServer.sendOSC('/live/master/devices/selected', (did))
+            self.oscEndpoint.send('/live/master/devices/selected', (did))
         elif type == 1:
-            self.oscServer.sendOSC('/live/return/device/selected', (tid, did))
+            self.oscEndpoint.send('/live/return/device/selected', (tid, did))
         else:
-            self.oscServer.sendOSC('/live/device/selected', (tid, did))        
+            self.oscEndpoint.send('/live/device/selected', (tid, did))        
         
     def tuple_idx(self, tuple, obj):
         for i in xrange(0,len(tuple)):

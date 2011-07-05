@@ -25,115 +25,114 @@ import Live
 import RemixNet
 import OSC
 import LiveUtils
+import sys
+
+from Logger import log
 
 class LiveOSCCallbacks:
-    def __init__(self, c_instance, oscServer):
-        if oscServer:
-            self.oscServer = oscServer
-            self.callbackManager = oscServer.callbackManager
-            self.oscClient = oscServer.oscClient
-            
-            self.c_instance = c_instance
-        else:
-            return
+    def __init__(self, c_instance, oscEndpoint):
+        self.oscEndpoint = oscEndpoint
+        self.callbackManager = oscEndpoint.callbackManager
 
-        self.callbackManager.add(self.tempoCB, "/live/tempo")
-        self.callbackManager.add(self.timeCB, "/live/time")
-        self.callbackManager.add(self.nextCueCB, "/live/next/cue")
-        self.callbackManager.add(self.prevCueCB, "/live/prev/cue")
-        self.callbackManager.add(self.playCB, "/live/play")
-        self.callbackManager.add(self.playContinueCB, "/live/play/continue")
-        self.callbackManager.add(self.playSelectionCB, "/live/play/selection")
-        self.callbackManager.add(self.playClipCB, "/live/play/clip")
-        self.callbackManager.add(self.playSceneCB, "/live/play/scene")  
-        self.callbackManager.add(self.stopCB, "/live/stop")
-        self.callbackManager.add(self.stopClipCB, "/live/stop/clip")
-        self.callbackManager.add(self.stopTrackCB, "/live/stop/track")
-        self.callbackManager.add(self.scenesCB, "/live/scenes")
-        self.callbackManager.add(self.tracksCB, "/live/tracks")
-        self.callbackManager.add(self.nameSceneCB, "/live/name/scene")
-        self.callbackManager.add(self.sceneCB, "/live/scene")
-        self.callbackManager.add(self.nameSceneBlockCB, "/live/name/sceneblock")
-        self.callbackManager.add(self.nameTrackCB, "/live/name/track")
-        self.callbackManager.add(self.nameTrackBlockCB, "/live/name/trackblock")
-        self.callbackManager.add(self.nameClipCB, "/live/name/clip")
-        self.callbackManager.add(self.nameClipBlockCB, "/live/name/clipblock")    
-        self.callbackManager.add(self.armTrackCB, "/live/arm")
-        self.callbackManager.add(self.muteTrackCB, "/live/mute")
-        self.callbackManager.add(self.soloTrackCB, "/live/solo")
-        self.callbackManager.add(self.volumeCB, "/live/volume")
-        self.callbackManager.add(self.panCB, "/live/pan")
-        self.callbackManager.add(self.sendCB, "/live/send")
-        self.callbackManager.add(self.pitchCB, "/live/pitch")
-        self.callbackManager.add(self.trackJump, "/live/track/jump")
-        self.callbackManager.add(self.trackInfoCB, "/live/track/info")
-        self.callbackManager.add(self.undoCB, "/live/undo")
-        self.callbackManager.add(self.redoCB, "/live/redo")
-        self.callbackManager.add(self.playClipSlotCB, "/live/play/clipslot")
-        
-        self.callbackManager.add(self.viewSceneCB, "/live/scene/view")
-        
-        self.callbackManager.add(self.viewTrackCB, "/live/track/view")
-        self.callbackManager.add(self.viewTrackCB, "/live/return/view")
-        self.callbackManager.add(self.mviewTrackCB, "/live/master/view")
-        
-        self.callbackManager.add(self.viewDeviceCB, "/live/track/device/view")
-        self.callbackManager.add(self.viewDeviceCB, "/live/return/device/view")
-        self.callbackManager.add(self.mviewDeviceCB, "/live/master/device/view")        
-        
-        self.callbackManager.add(self.viewClipCB, "/live/clip/view")
-        
-        self.callbackManager.add(self.detailViewCB, "/live/detail/view")
-        
-        self.callbackManager.add(self.overdubCB, "/live/overdub")
-        self.callbackManager.add(self.stateCB, "/live/state")
-        self.callbackManager.add(self.clipInfoCB, "/live/clip/info")
-        
-        self.callbackManager.add(self.muteTrackCB, "/live/return/mute")
-        self.callbackManager.add(self.soloTrackCB, "/live/return/solo")
-        self.callbackManager.add(self.volumeCB, "/live/return/volume")
-        self.callbackManager.add(self.panCB, "/live/return/pan")
-        self.callbackManager.add(self.sendCB, "/live/return/send")        
+        self.c_instance = c_instance
 
-        self.callbackManager.add(self.volumeCB, "/live/master/volume")
-        self.callbackManager.add(self.panCB, "/live/master/pan")
+        self.callbackManager.add("/live/tempo", self.tempoCB)
+        self.callbackManager.add("/live/time", self.timeCB)
+        self.callbackManager.add("/live/next/cue", self.nextCueCB)
+        self.callbackManager.add("/live/prev/cue", self.prevCueCB)
+        self.callbackManager.add("/live/play", self.playCB)
+        self.callbackManager.add("/live/play/continue", self.playContinueCB)
+        self.callbackManager.add("/live/play/selection", self.playSelectionCB)
+        self.callbackManager.add("/live/play/clip", self.playClipCB)
+        self.callbackManager.add("/live/play/scene", self.playSceneCB)  
+        self.callbackManager.add("/live/stop", self.stopCB)
+        self.callbackManager.add("/live/stop/clip", self.stopClipCB)
+        self.callbackManager.add("/live/stop/track", self.stopTrackCB)
+        self.callbackManager.add("/live/scenes", self.scenesCB)
+        self.callbackManager.add("/live/tracks", self.tracksCB)
+        self.callbackManager.add("/live/name/scene", self.nameSceneCB)
+        self.callbackManager.add("/live/scene", self.sceneCB)
+        self.callbackManager.add("/live/name/sceneblock", self.nameSceneBlockCB)
+        self.callbackManager.add("/live/name/track", self.nameTrackCB)
+        self.callbackManager.add("/live/name/trackblock", self.nameTrackBlockCB)
+        self.callbackManager.add("/live/name/clip", self.nameClipCB)
+        self.callbackManager.add("/live/name/clipblock", self.nameClipBlockCB)    
+        self.callbackManager.add("/live/arm", self.armTrackCB)
+        self.callbackManager.add("/live/mute", self.muteTrackCB)
+        self.callbackManager.add("/live/solo", self.soloTrackCB)
+        self.callbackManager.add("/live/volume", self.volumeCB)
+        self.callbackManager.add("/live/pan", self.panCB)
+        self.callbackManager.add("/live/send", self.sendCB)
+        self.callbackManager.add("/live/pitch", self.pitchCB)
+        self.callbackManager.add("/live/track/jump", self.trackJump)
+        self.callbackManager.add("/live/track/info", self.trackInfoCB)
+        self.callbackManager.add("/live/undo", self.undoCB)
+        self.callbackManager.add("/live/redo", self.redoCB)
+        self.callbackManager.add("/live/play/clipslot", self.playClipSlotCB)
         
-        self.callbackManager.add(self.devicelistCB, "/live/devicelist")
-        self.callbackManager.add(self.devicelistCB, "/live/return/devicelist")
-        self.callbackManager.add(self.mdevicelistCB, "/live/master/devicelist")
-
-        self.callbackManager.add(self.devicerangeCB, "/live/device/range")
-        self.callbackManager.add(self.devicerangeCB, "/live/return/device/range")
-        self.callbackManager.add(self.mdevicerangeCB, "/live/master/device/range")
+        self.callbackManager.add("/live/scene/view", self.viewSceneCB)
         
-        self.callbackManager.add(self.deviceCB, "/live/device")
-        self.callbackManager.add(self.deviceCB, "/live/return/device")
-        self.callbackManager.add(self.mdeviceCB, "/live/master/device")
+        self.callbackManager.add("/live/track/view", self.viewTrackCB)
+        self.callbackManager.add("/live/return/view", self.viewTrackCB)
+        self.callbackManager.add("/live/master/view", self.mviewTrackCB)
         
-        self.callbackManager.add(self.loopStateCB, "/live/clip/loopstate")
-        self.callbackManager.add(self.loopStartCB, "/live/clip/loopstart")
-        self.callbackManager.add(self.loopEndCB, "/live/clip/loopend")
+        self.callbackManager.add("/live/track/device/view", self.viewDeviceCB)
+        self.callbackManager.add("/live/return/device/view", self.viewDeviceCB)
+        self.callbackManager.add("/live/master/device/view", self.mviewDeviceCB)        
         
-        self.callbackManager.add(self.loopStateCB, "/live/clip/loopstate_id")
-        self.callbackManager.add(self.loopStartCB, "/live/clip/loopstart_id")
-        self.callbackManager.add(self.loopEndCB, "/live/clip/loopend_id")
+        self.callbackManager.add("/live/clip/view", self.viewClipCB)
         
-        self.callbackManager.add(self.warpingCB, "/live/clip/warping")
+        self.callbackManager.add("/live/detail/view", self.detailViewCB)
         
-        self.callbackManager.add(self.sigCB, "/live/clip/signature")
+        self.callbackManager.add("/live/overdub", self.overdubCB)
+        self.callbackManager.add("/live/state", self.stateCB)
+        self.callbackManager.add("/live/clip/info", self.clipInfoCB)
+        
+        self.callbackManager.add("/live/return/mute", self.muteTrackCB)
+        self.callbackManager.add("/live/return/solo", self.soloTrackCB)
+        self.callbackManager.add("/live/return/volume", self.volumeCB)
+        self.callbackManager.add("/live/return/pan", self.panCB)
+        self.callbackManager.add("/live/return/send", self.sendCB)        
 
-        self.callbackManager.add(self.addNoteCB, "/live/clip/add_note")
-        self.callbackManager.add(self.getNotesCB, "/live/clip/notes")
+        self.callbackManager.add("/live/master/volume", self.volumeCB)
+        self.callbackManager.add("/live/master/pan", self.panCB)
+        
+        self.callbackManager.add("/live/devicelist", self.devicelistCB)
+        self.callbackManager.add("/live/return/devicelist", self.devicelistCB)
+        self.callbackManager.add("/live/master/devicelist", self.mdevicelistCB)
 
-        self.callbackManager.add(self.crossfaderCB, "/live/master/crossfader")
-        self.callbackManager.add(self.trackxfaderCB, "/live/track/crossfader")
-        self.callbackManager.add(self.trackxfaderCB, "/live/return/crossfader")
+        self.callbackManager.add("/live/device/range", self.devicerangeCB)
+        self.callbackManager.add("/live/return/device/range", self.devicerangeCB)
+        self.callbackManager.add("/live/master/device/range", self.mdevicerangeCB)
+        
+        self.callbackManager.add("/live/device", self.deviceCB)
+        self.callbackManager.add("/live/return/device", self.deviceCB)
+        self.callbackManager.add("/live/master/device", self.mdeviceCB)
+        
+        self.callbackManager.add("/live/clip/loopstate", self.loopStateCB)
+        self.callbackManager.add("/live/clip/loopstart", self.loopStartCB)
+        self.callbackManager.add("/live/clip/loopend", self.loopEndCB)
+        
+        self.callbackManager.add("/live/clip/loopstate_id", self.loopStateCB)
+        self.callbackManager.add("/live/clip/loopstart_id", self.loopStartCB)
+        self.callbackManager.add("/live/clip/loopend_id", self.loopEndCB)
+        
+        self.callbackManager.add("/live/clip/warping", self.warpingCB)
+        
+        self.callbackManager.add("/live/clip/signature", self.sigCB)
 
-        self.callbackManager.add(self.quantizationCB, "/live/quantization")
+        self.callbackManager.add("/live/clip/add_note", self.addNoteCB)
+        self.callbackManager.add("/live/clip/notes", self.getNotesCB)
 
-        self.callbackManager.add(self.selectionCB, "/live/selection")
+        self.callbackManager.add("/live/master/crossfader", self.crossfaderCB)
+        self.callbackManager.add("/live/track/crossfader", self.trackxfaderCB)
+        self.callbackManager.add("/live/return/crossfader", self.trackxfaderCB)
 
-    def sigCB(self, msg):
+        self.callbackManager.add("/live/quantization", self.quantizationCB)
+
+        self.callbackManager.add("/live/selection", self.selectionCB)
+
+    def sigCB(self, msg, source):
         """ Called when a /live/clip/signature message is recieved
         """
         track = msg[2]
@@ -141,14 +140,14 @@ class LiveOSCCallbacks:
         c = LiveUtils.getSong().visible_tracks[track].clip_slots[clip].clip
         
         if len(msg) == 4:
-            self.oscServer.sendOSC("/live/clip/signature", (track, clip, c.signature_numerator, c.signature_denominator))
+            self.oscEndpoint.send("/live/clip/signature", (track, clip, c.signature_numerator, c.signature_denominator))
             
         if len(msg) == 6:
-            self.oscServer.sendOSC("/live/clip/signature", 1)
+            self.oscEndpoint.send("/live/clip/signature", 1)
             c.signature_denominator = msg[5]
             c.signature_numerator = msg[4]
 
-    def warpingCB(self, msg):
+    def warpingCB(self, msg, source):
         """ Called when a /live/clip/warping message is recieved
         """
         track = msg[2]
@@ -157,18 +156,18 @@ class LiveOSCCallbacks:
         
         if len(msg) == 4:
             state = LiveUtils.getSong().visible_tracks[track].clip_slots[clip].clip.warping
-            self.oscServer.sendOSC("/live/clip/warping", (track, clip, int(state)))
+            self.oscEndpoint.send("/live/clip/warping", (track, clip, int(state)))
         
         elif len(msg) == 5:
             LiveUtils.getSong().visible_tracks[track].clip_slots[clip].clip.warping = msg[4]
 
-    def selectionCB(self, msg):
+    def selectionCB(self, msg, source):
         """ Called when a /live/selection message is received
         """
         if len(msg) == 6:
             self.c_instance.set_session_highlight(msg[2], msg[3], msg[4], msg[5], 0)
 
-    def trackxfaderCB(self, msg):
+    def trackxfaderCB(self, msg, source):
         """ Called when a /live/track/crossfader or /live/return/crossfader message is received
         """
         ty = msg[0] == '/live/return/crossfader' and 1 or 0
@@ -180,12 +179,12 @@ class LiveOSCCallbacks:
                 assign = LiveUtils.getSong().return_tracks[track].mixer_device.crossfade_assign
                 name   = LiveUtils.getSong().return_tracks[track].mixer_device.crossfade_assignments.values[assign]
             
-                self.oscServer.sendOSC("/live/return/crossfader", (track, str(assign), str(name)))
+                self.oscEndpoint.send("/live/return/crossfader", (track, str(assign), str(name)))
             else:
                 assign = LiveUtils.getSong().visible_tracks[track].mixer_device.crossfade_assign
                 name   = LiveUtils.getSong().visible_tracks[track].mixer_device.crossfade_assignments.values[assign]
             
-                self.oscServer.sendOSC("/live/track/crossfader", (track, str(assign), str(name)))
+                self.oscEndpoint.send("/live/track/crossfader", (track, str(assign), str(name)))
 
             
         elif len(msg) == 4:
@@ -197,7 +196,7 @@ class LiveOSCCallbacks:
             else:
                 LiveUtils.getSong().visible_tracks[track].mixer_device.crossfade_assign = assign
 
-    def tempoCB(self, msg):
+    def tempoCB(self, msg, source):
         """Called when a /live/tempo message is received.
 
         Messages:
@@ -205,13 +204,13 @@ class LiveOSCCallbacks:
         /live/tempo (float tempo)   Set the tempo, replies with /live/tempo (float tempo)
         """
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
-            self.oscServer.sendOSC("/live/tempo", LiveUtils.getTempo())
+            self.oscEndpoint.send("/live/tempo", LiveUtils.getTempo())
         
         elif len(msg) == 3:
             tempo = msg[2]
             LiveUtils.setTempo(tempo)
         
-    def timeCB(self, msg):
+    def timeCB(self, msg, source):
         """Called when a /live/time message is received.
 
         Messages:
@@ -219,13 +218,13 @@ class LiveOSCCallbacks:
         /live/time (float time)    Set the time , replies with /live/time (float time)
         """
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
-            self.oscServer.sendOSC("/live/time", float(LiveUtils.currentTime()))
+            self.oscEndpoint.send("/live/time", float(LiveUtils.currentTime()))
 
         elif len(msg) == 3:
             time = msg[2]
             LiveUtils.currentTime(time)
 
-    def nextCueCB(self, msg):
+    def nextCueCB(self, msg, source):
         """Called when a /live/next/cue message is received.
 
         Messages:
@@ -233,7 +232,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.jumpToNextCue()
         
-    def prevCueCB(self, msg):
+    def prevCueCB(self, msg, source):
         """Called when a /live/prev/cue message is received.
 
         Messages:
@@ -241,7 +240,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.jumpToPrevCue()
         
-    def playCB(self, msg):
+    def playCB(self, msg, source):
         """Called when a /live/play message is received.
 
         Messages:
@@ -249,7 +248,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.play()
         
-    def playContinueCB(self, msg):
+    def playContinueCB(self, msg, source):
         """Called when a /live/play/continue message is received.
 
         Messages:
@@ -257,7 +256,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.continuePlaying()
         
-    def playSelectionCB(self, msg):
+    def playSelectionCB(self, msg, source):
         """Called when a /live/play/selection message is received.
 
         Messages:
@@ -265,7 +264,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.playSelection()
         
-    def playClipCB(self, msg):
+    def playClipCB(self, msg, source):
         """Called when a /live/play/clip message is received.
 
         Messages:
@@ -276,7 +275,7 @@ class LiveOSCCallbacks:
             clip = msg[3]
             LiveUtils.launchClip(track, clip)
             
-    def playSceneCB(self, msg):
+    def playSceneCB(self, msg, source):
         """Called when a /live/play/scene message is received.
 
         Messages:
@@ -286,7 +285,7 @@ class LiveOSCCallbacks:
             scene = msg[2]
             LiveUtils.launchScene(scene)
     
-    def stopCB(self, msg):
+    def stopCB(self, msg, source):
         """Called when a /live/stop message is received.
 
         Messages:
@@ -294,7 +293,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.stop()
         
-    def stopClipCB(self, msg):
+    def stopClipCB(self, msg, source):
         """Called when a /live/stop/clip message is received.
 
         Messages:
@@ -305,7 +304,7 @@ class LiveOSCCallbacks:
             clip = msg[3]
             LiveUtils.stopClip(track, clip)
 
-    def stopTrackCB(self, msg):
+    def stopTrackCB(self, msg, source):
         """Called when a /live/stop/track message is received.
 
         Messages:
@@ -315,7 +314,7 @@ class LiveOSCCallbacks:
             track = msg[2]
             LiveUtils.stopTrack(track)
 
-    def scenesCB(self, msg):
+    def scenesCB(self, msg, source):
         """Called when a /live/scenes message is received.
 
         Messages:
@@ -324,10 +323,10 @@ class LiveOSCCallbacks:
         """
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
             sceneTotal = len(LiveUtils.getScenes())
-            self.oscServer.sendOSC("/live/scenes", (sceneTotal))
+            self.oscEndpoint.send("/live/scenes", (sceneTotal))
             return
 
-    def sceneCB(self, msg):
+    def sceneCB(self, msg, source):
         """Called when a /live/scene message is received.
         
         Messages:
@@ -343,14 +342,13 @@ class LiveOSCCallbacks:
                 if scene == selected_scene:
                     selected_index = index
                     
-            self.oscServer.sendOSC("/live/scene", (selected_index))
+            self.oscEndpoint.send("/live/scene", (selected_index))
             
         elif len(msg) == 3:
             scene = msg[2]
             LiveUtils.getSong().view.selected_scene = LiveUtils.getSong().scenes[scene]
-        
 
-    def tracksCB(self, msg):
+    def tracksCB(self, msg, source):
         """Called when a /live/tracks message is received.
 
         Messages:
@@ -359,11 +357,11 @@ class LiveOSCCallbacks:
         """
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
             trackTotal = len(LiveUtils.getTracks())
-            self.oscServer.sendOSC("/live/tracks", (trackTotal))
+            self.oscEndpoint.send("/live/tracks", (trackTotal))
             return
 
 
-    def nameSceneCB(self, msg):
+    def nameSceneCB(self, msg, source):
         """Called when a /live/name/scene message is received.
 
         Messages:
@@ -374,15 +372,17 @@ class LiveOSCCallbacks:
         """        
         #Requesting all scene names
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
+            bundle = OSC.OSCBundle()
             sceneNumber = 0
             for scene in LiveUtils.getScenes():
-                self.oscServer.sendOSC("/live/name/scene", (sceneNumber, str(scene.name)))
+                bundle.append("/live/name/scene", (sceneNumber, str(scene.name)))
                 sceneNumber = sceneNumber + 1
+            self.oscEndpoint.sendMessage(bundle)
             return
         #Requesting a single scene name
         if len(msg) == 3:
             sceneNumber = msg[2]
-            self.oscServer.sendOSC("/live/name/scene", (sceneNumber, str(LiveUtils.getScene(sceneNumber).name)))
+            self.oscEndpoint.send("/live/name/scene", (sceneNumber, str(LiveUtils.getScene(sceneNumber).name)))
             return
         #renaming a scene
         if len(msg) == 4:
@@ -390,7 +390,7 @@ class LiveOSCCallbacks:
             name = msg[3]
             LiveUtils.getScene(sceneNumber).name = name
 
-    def nameSceneBlockCB(self, msg):
+    def nameSceneBlockCB(self, msg, source):
         """Called when a /live/name/sceneblock message is received.
 
         /live/name/clipblock    (int offset, int blocksize) Returns a list of blocksize scene names starting at offset
@@ -401,10 +401,10 @@ class LiveOSCCallbacks:
             blocksize = msg[3]
             for scene in range(0, blocksize):
                 block.extend([str(LiveUtils.getScene(sceneOffset+scene).name)])                            
-            self.oscServer.sendOSC("/live/name/sceneblock", block)
+            self.oscEndpoint.send("/live/name/sceneblock", block)
             
             
-    def nameTrackCB(self, msg):
+    def nameTrackCB(self, msg, source):
         """Called when a /live/name/track message is received.
 
         Messages:
@@ -413,17 +413,20 @@ class LiveOSCCallbacks:
         /live/name/track    (int track, string name)Sets track number track's name to name
 
         """        
+        
         #Requesting all track names
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
             trackNumber = 0
+            bundle = OSC.OSCBundle()
             for track in LiveUtils.getTracks():
-                self.oscServer.sendOSC("/live/name/track", (trackNumber, str(track.name)))
+                bundle.append("/live/name/track", (trackNumber, str(track.name)))
                 trackNumber = trackNumber + 1
+            self.oscEndpoint.sendMessage(bundle)
             return
         #Requesting a single track name
         if len(msg) == 3:
             trackNumber = msg[2]
-            self.oscServer.sendOSC("/live/name/track", (trackNumber, str(LiveUtils.getTrack(trackNumber).name)))
+            self.oscEndpoint.send("/live/name/track", (trackNumber, str(LiveUtils.getTrack(trackNumber).name)))
             return
         #renaming a track
         if len(msg) == 4:
@@ -431,7 +434,7 @@ class LiveOSCCallbacks:
             name = msg[3]
             LiveUtils.getTrack(trackNumber).name = name
 
-    def nameTrackBlockCB(self, msg):
+    def nameTrackBlockCB(self, msg, source):
         """Called when a /live/name/trackblock message is received.
 
         /live/name/trackblock    (int offset, int blocksize) Returns a list of blocksize track names starting at offset
@@ -442,10 +445,9 @@ class LiveOSCCallbacks:
             blocksize = msg[3]
             for track in range(0, blocksize):
                 block.extend([str(LiveUtils.getTrack(trackOffset+track).name)])                            
-            self.oscServer.sendOSC("/live/name/trackblock", block)
+            self.oscEndpoint.send("/live/name/trackblock", block)
 
-
-    def nameClipBlockCB(self, msg):
+    def nameClipBlockCB(self, msg, source):
         """Called when a /live/name/clipblock message is received.
 
         /live/name/clipblock    (int track, int clip, blocksize x/tracks, blocksize y/clipslots) Returns a list of clip names for a block of clips (int blockX, int blockY, clipname)
@@ -468,11 +470,11 @@ class LiveOSCCallbacks:
                         else:
                             block.extend([""])
                             
-            self.oscServer.sendOSC("/live/name/clipblock", block)
+            self.oscEndpoint.send("/live/name/clipblock", block)
 
 
 
-    def nameClipCB(self, msg):
+    def nameClipCB(self, msg, source):
         """Called when a /live/name/clip message is received.
 
         Messages:
@@ -487,10 +489,14 @@ class LiveOSCCallbacks:
             trackNumber = 0
             clipNumber = 0
             for track in LiveUtils.getTracks():
+                bundle = OSC.OSCBundle()
                 for clipSlot in track.clip_slots:
                     if clipSlot.clip != None:
-                        self.oscServer.sendOSC("/live/name/clip", (trackNumber, clipNumber, str(clipSlot.clip.name), clipSlot.clip.color))
+                        bundle.append("/live/name/clip", (trackNumber, clipNumber, str(clipSlot.clip.name), clipSlot.clip.color))
                     clipNumber = clipNumber + 1
+                    #if clipNumber >= 8:
+                    #    break
+                self.oscEndpoint.sendMessage(bundle)
                 clipNumber = 0
                 trackNumber = trackNumber + 1
             return
@@ -498,7 +504,7 @@ class LiveOSCCallbacks:
         if len(msg) == 4:
             trackNumber = msg[2]
             clipNumber = msg[3]
-            self.oscServer.sendOSC("/live/name/clip", (trackNumber, clipNumber, str(LiveUtils.getClip(trackNumber, clipNumber).name), LiveUtils.getClip(trackNumber, clipNumber).color))
+            self.oscEndpoint.send("/live/name/clip", (trackNumber, clipNumber, str(LiveUtils.getClip(trackNumber, clipNumber).name), LiveUtils.getClip(trackNumber, clipNumber).color))
             return
         #renaming a clip
         if len(msg) >= 5:
@@ -513,7 +519,7 @@ class LiveOSCCallbacks:
             color = msg[5]
             LiveUtils.getClip(trackNumber, clipNumber).color = color
 
-    def addNoteCB(self, msg):
+    def addNoteCB(self, msg, source):
         """Called when a /live/clip/add_note message is received
 
         Messages:
@@ -530,9 +536,9 @@ class LiveOSCCallbacks:
 
         notes = ((pitch, time, duration, velocity, muted),)
         LiveUtils.getClip(trackNumber, clipNumber).replace_selected_notes(notes)
-        self.oscServer.sendOSC('/live/clip/note', (trackNumber, clipNumber, pitch, time, duration, velocity, muted));
+        self.oscEndpoint.send('/live/clip/note', (trackNumber, clipNumber, pitch, time, duration, velocity, muted))
 
-    def getNotesCB(self, msg):
+    def getNotesCB(self, msg, source):
         """Called when a /live/clip/notes message is received
 
         Messages:
@@ -542,6 +548,7 @@ class LiveOSCCallbacks:
         trackNumber = msg[2]
         clipNumber = msg[3]
         LiveUtils.getClip(trackNumber, clipNumber).select_all_notes()
+        bundle = OSC.OSCBundle()
         for note in LiveUtils.getClip(trackNumber, clipNumber).get_selected_notes():
             pitch = note[0]
             time = note[1]
@@ -550,9 +557,10 @@ class LiveOSCCallbacks:
             muted = 0
             if note[4]:
                 muted = 1
-            self.oscServer.sendOSC('/live/clip/note', (trackNumber, clipNumber, pitch, time, duration, velocity, muted));
+            bundle.append('/live/clip/note', (trackNumber, clipNumber, pitch, time, duration, velocity, muted))
+        self.oscEndpoint.sendMessage(bundle)
     
-    def armTrackCB(self, msg):
+    def armTrackCB(self, msg, source):
         """Called when a /live/arm message is received.
 
         Messages:
@@ -568,9 +576,9 @@ class LiveOSCCallbacks:
         # Return arm status        
         elif len(msg) == 3:
             status = LiveUtils.getTrack(track).arm
-            self.oscServer.sendOSC("/live/arm", (track, int(status)))     
+            self.oscEndpoint.send("/live/arm", (track, int(status)))     
             
-    def muteTrackCB(self, msg):
+    def muteTrackCB(self, msg, source):
         """Called when a /live/mute message is received.
 
         Messages:
@@ -588,13 +596,13 @@ class LiveOSCCallbacks:
         elif len(msg) == 3:
             if ty == 1:
                 status = LiveUtils.getSong().return_tracks[track].mute
-                self.oscServer.sendOSC("/live/return/mute", (track, int(status)))
+                self.oscEndpoint.send("/live/return/mute", (track, int(status)))
                 
             else:
                 status = LiveUtils.getTrack(track).mute
-                self.oscServer.sendOSC("/live/mute", (track, int(status)))
+                self.oscEndpoint.send("/live/mute", (track, int(status)))
             
-    def soloTrackCB(self, msg):
+    def soloTrackCB(self, msg, source):
         """Called when a /live/solo message is received.
 
         Messages:
@@ -612,13 +620,13 @@ class LiveOSCCallbacks:
         elif len(msg) == 3:
             if ty == 1:
                 status = LiveUtils.getSong().return_tracks[track].solo
-                self.oscServer.sendOSC("/live/return/solo", (track, int(status)))
+                self.oscEndpoint.send("/live/return/solo", (track, int(status)))
                 
             else:
                 status = LiveUtils.getTrack(track).solo
-                self.oscServer.sendOSC("/live/solo", (track, int(status)))
+                self.oscEndpoint.send("/live/solo", (track, int(status)))
             
-    def volumeCB(self, msg):
+    def volumeCB(self, msg, source):
         """Called when a /live/volume message is received.
 
         Messages:
@@ -633,7 +641,7 @@ class LiveOSCCallbacks:
             ty = 0
         
         if len(msg) == 2 and ty == 2:
-            self.oscServer.sendOSC("/live/master/volume", LiveUtils.getSong().master_track.mixer_device.volume.value)
+            self.oscEndpoint.send("/live/master/volume", LiveUtils.getSong().master_track.mixer_device.volume.value)
         
         elif len(msg) == 3 and ty == 2:
             volume = msg[2]
@@ -652,12 +660,12 @@ class LiveOSCCallbacks:
             track = msg[2]
 
             if ty == 1:
-                self.oscServer.sendOSC("/live/return/volume", (track, LiveUtils.getSong().return_tracks[track].mixer_device.volume.value))
+                self.oscEndpoint.send("/live/return/volume", (track, LiveUtils.getSong().return_tracks[track].mixer_device.volume.value))
             
             else:
-                self.oscServer.sendOSC("/live/volume", (track, LiveUtils.trackVolume(track)))
+                self.oscEndpoint.send("/live/volume", (track, LiveUtils.trackVolume(track)))
             
-    def panCB(self, msg):
+    def panCB(self, msg, source):
         """Called when a /live/pan message is received.
 
         Messages:
@@ -673,7 +681,7 @@ class LiveOSCCallbacks:
             ty = 0
         
         if len(msg) == 2 and ty == 2:
-            self.oscServer.sendOSC("/live/master/pan", LiveUtils.getSong().master_track.mixer_device.panning.value)
+            self.oscEndpoint.send("/live/master/pan", LiveUtils.getSong().master_track.mixer_device.panning.value)
         
         elif len(msg) == 3 and ty == 2:
             pan = msg[2]
@@ -692,13 +700,13 @@ class LiveOSCCallbacks:
             track = msg[2]
             
             if ty == 1:
-                self.oscServer.sendOSC("/live/pan", (track, LiveUtils.getSong().return_tracks[track].mixer_device.panning.value))
+                self.oscEndpoint.send("/live/pan", (track, LiveUtils.getSong().return_tracks[track].mixer_device.panning.value))
             
             else:
-                self.oscServer.sendOSC("/live/pan", (track, LiveUtils.trackPan(track)))
+                self.oscEndpoint.send("/live/pan", (track, LiveUtils.trackPan(track)))
 
             
-    def sendCB(self, msg):
+    def sendCB(self, msg, source):
         """Called when a /live/send message is received.
 
         Messages:
@@ -721,10 +729,10 @@ class LiveOSCCallbacks:
         elif len(msg) == 4:
             send = msg[3]
             if ty == 1:
-                self.oscServer.sendOSC("/live/return/send", (track, send, float(LiveUtils.getSong().return_tracks[track].mixer_device.sends[send].value)))
+                self.oscEndpoint.send("/live/return/send", (track, send, float(LiveUtils.getSong().return_tracks[track].mixer_device.sends[send].value)))
 
             else:
-                self.oscServer.sendOSC("/live/send", (track, send, float(LiveUtils.trackSend(track, send))))
+                self.oscEndpoint.send("/live/send", (track, send, float(LiveUtils.trackSend(track, send))))
             
         elif len(msg) == 3:
             if ty == 1:
@@ -738,13 +746,13 @@ class LiveOSCCallbacks:
                 so.append(float(sends[i].value))
                 
             if ty == 1:
-                self.oscServer.sendOSC("/live/return/send", tuple(so))
+                self.oscEndpoint.send("/live/return/send", tuple(so))
             else:
-                self.oscServer.sendOSC("/live/send", tuple(so))
+                self.oscEndpoint.send("/live/send", tuple(so))
                 
         
             
-    def pitchCB(self, msg):
+    def pitchCB(self, msg, source):
         """Called when a /live/pitch message is received.
 
         Messages:
@@ -761,9 +769,9 @@ class LiveOSCCallbacks:
         if len(msg) ==4:
             track = msg[2]
             clip = msg[3]
-            self.oscServer.sendOSC("/live/pitch", LiveUtils.clipPitch(track, clip))
+            self.oscEndpoint.send("/live/pitch", LiveUtils.clipPitch(track, clip))
 
-    def trackJump(self, msg):
+    def trackJump(self, msg, source):
         """Called when a /live/track/jump message is received.
 
         Messages:
@@ -775,7 +783,7 @@ class LiveOSCCallbacks:
             track = LiveUtils.getTrack(track)
             track.jump_in_running_session_clip(beats)
 
-    def trackInfoCB(self, msg):
+    def trackInfoCB(self, msg, source):
         """Called when a /live/track/info message is received.
 
         Messages:
@@ -821,10 +829,10 @@ class LiveOSCCallbacks:
                     
             tu = tuple(li)
             
-            self.oscServer.sendOSC("/live/track/info", tu)
+            self.oscEndpoint.send("/live/track/info", tu)
 
 
-    def undoCB(self, msg):
+    def undoCB(self, msg, source):
         """Called when a /live/undo message is received.
         
         Messages:
@@ -832,7 +840,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.getSong().undo()
         
-    def redoCB(self, msg):
+    def redoCB(self, msg, source):
         """Called when a /live/redo message is received.
         
         Messages:
@@ -840,7 +848,7 @@ class LiveOSCCallbacks:
         """
         LiveUtils.getSong().redo()
         
-    def playClipSlotCB(self, msg):
+    def playClipSlotCB(self, msg, source):
         """Called when a /live/play/clipslot message is received.
         
         Messages:
@@ -853,7 +861,7 @@ class LiveOSCCallbacks:
             clipslot = track.clip_slots[clip_num]
             clipslot.fire()
 
-    def viewSceneCB(self, msg):
+    def viewSceneCB(self, msg, source):
         """Called when a /live/scene/view message is received.
         
         Messages:
@@ -864,7 +872,7 @@ class LiveOSCCallbacks:
             scene = msg[2]
             LiveUtils.getSong().view.selected_scene = LiveUtils.getSong().scenes[scene]
             
-    def viewTrackCB(self, msg):
+    def viewTrackCB(self, msg, source):
         """Called when a /live/track/view message is received.
         
         Messages:
@@ -884,7 +892,7 @@ class LiveOSCCallbacks:
                 
             #track.view.select_instrument()
             
-    def mviewTrackCB(self, msg):
+    def mviewTrackCB(self, msg, source):
         """Called when a /live/master/view message is received.
         
         Messages:
@@ -897,7 +905,7 @@ class LiveOSCCallbacks:
         
         #track.view.select_instrument()
         
-    def viewClipCB(self, msg):
+    def viewClipCB(self, msg, source):
         """Called when a /live/clip/view message is received.
         
         Messages:
@@ -914,7 +922,7 @@ class LiveOSCCallbacks:
         LiveUtils.getSong().view.detail_clip = track.clip_slots[clip].clip
         Live.Application.get_application().view.show_view("Detail/Clip")  
 
-    def detailViewCB(self, msg):
+    def detailViewCB(self, msg, source):
         """Called when a /live/detail/view message is received. Used to switch between clip/track detail
 
         Messages:
@@ -926,7 +934,7 @@ class LiveOSCCallbacks:
             elif msg[2] == 1:
                 Live.Application.get_application().view.show_view("Detail/DeviceChain")
 
-    def viewDeviceCB(self, msg):
+    def viewDeviceCB(self, msg, source):
         """Called when a /live/track/device/view message is received.
         
         Messages:
@@ -945,7 +953,7 @@ class LiveOSCCallbacks:
             LiveUtils.getSong().view.select_device(track.devices[msg[3]])
             Live.Application.get_application().view.show_view("Detail/DeviceChain")
             
-    def mviewDeviceCB(self, msg):
+    def mviewDeviceCB(self, msg, source):
         track = LiveUtils.getSong().master_track
         
         if len(msg) == 3:
@@ -953,7 +961,7 @@ class LiveOSCCallbacks:
             LiveUtils.getSong().view.select_device(track.devices[msg[2]])
             Live.Application.get_application().view.show_view("Detail/DeviceChain")
         
-    def overdubCB(self, msg):
+    def overdubCB(self, msg, source):
         """Called when a /live/overdub message is received.
         
         Messages:
@@ -963,7 +971,7 @@ class LiveOSCCallbacks:
             overdub = msg[2]
             LiveUtils.getSong().overdub = overdub
 
-    def stateCB(self, msg):
+    def stateCB(self, msg, source):
         """Called when a /live/state is received.
         
         Messages:
@@ -972,7 +980,7 @@ class LiveOSCCallbacks:
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
             tempo = LiveUtils.getTempo()
             overdub = LiveUtils.getSong().overdub
-            self.oscServer.sendOSC("/live/state", (tempo, int(overdub)))
+            self.oscEndpoint.send("/live/state", (tempo, int(overdub)))
         
     def clipInfoCB(self,msg):
         """Called when a /live/clip/info message is received.
@@ -998,11 +1006,11 @@ class LiveOSCCallbacks:
                 elif clip.is_triggered == 1:
                     playing = 3
 
-            self.oscServer.sendOSC("/live/clip/info", (trackNumber, clipNumber, playing))
+            self.oscEndpoint.send("/live/clip/info", (trackNumber, clipNumber, playing))
         
         return
         
-    def deviceCB(self, msg):
+    def deviceCB(self, msg, source):
         ty = msg[0] == '/live/return/device' and 1 or 0
         track = msg[2]
     
@@ -1020,7 +1028,7 @@ class LiveOSCCallbacks:
                 po.append(float(params[i].value))
                 po.append(str(params[i].name))
             
-            self.oscServer.sendOSC(ty == 1 and "/live/return/device/allparam" or "/live/device/allparam", tuple(po))
+            self.oscEndpoint.send(ty == 1 and "/live/return/device/allparam" or "/live/device/allparam", tuple(po))
     
         elif len(msg) == 5:
             device = msg[3]
@@ -1031,7 +1039,7 @@ class LiveOSCCallbacks:
             else: 
                 p = LiveUtils.getSong().visible_tracks[track].devices[device].parameters[param]
         
-            self.oscServer.sendOSC(ty == 1 and "/live/return/device/param" or "/live/device/param", (track, device, param, p.value, str(p.name)))
+            self.oscEndpoint.send(ty == 1 and "/live/return/device/param" or "/live/device/param", (track, device, param, p.value, str(p.name)))
     
     
         elif len(msg) == 6:
@@ -1044,7 +1052,7 @@ class LiveOSCCallbacks:
             else:
                 LiveUtils.getSong().visible_tracks[track].devices[device].parameters[param].value = value
 
-    def devicerangeCB(self, msg):
+    def devicerangeCB(self, msg, source):
         ty = msg[0] == '/live/return/device/range' and 1 or 0
         track = msg[2]
     
@@ -1062,7 +1070,7 @@ class LiveOSCCallbacks:
                 po.append(params[i].min)
                 po.append(params[i].max)
             
-            self.oscServer.sendOSC(ty == 1 and "/live/return/device/range" or "/live/device/range", tuple(po))
+            self.oscEndpoint.send(ty == 1 and "/live/return/device/range" or "/live/device/range", tuple(po))
     
         elif len(msg) == 5:
             device = msg[3]
@@ -1073,9 +1081,9 @@ class LiveOSCCallbacks:
             else: 
                 p = LiveUtils.getSong().visible_tracks[track].devices[device].parameters[param]
         
-            self.oscServer.sendOSC(ty == 1 and "/live/return/device/range" or "/live/device/range", (track, device, param, p.min, p.max))
+            self.oscEndpoint.send(ty == 1 and "/live/return/device/range" or "/live/device/range", (track, device, param, p.min, p.max))
                 
-    def devicelistCB(self, msg):
+    def devicelistCB(self, msg, source):
         ty = msg[0] == '/live/return/devicelist' and 1 or 0
 
         track = msg[2]
@@ -1092,9 +1100,9 @@ class LiveOSCCallbacks:
                 do.append(i)
                 do.append(str(devices[i].name))
             
-            self.oscServer.sendOSC(ty == 1 and "/live/return/devicelist" or "/live/devicelist", tuple(do))
+            self.oscEndpoint.send(ty == 1 and "/live/return/devicelist" or "/live/devicelist", tuple(do))
 
-    def mdeviceCB(self, msg):
+    def mdeviceCB(self, msg, source):
         if len(msg) == 3:
             device = msg[2]
             po = [device]
@@ -1106,7 +1114,7 @@ class LiveOSCCallbacks:
                 po.append(float(params[i].value))
                 po.append(str(params[i].name))
             
-            self.oscServer.sendOSC("/live/master/device", tuple(po))
+            self.oscEndpoint.send("/live/master/device", tuple(po))
     
         elif len(msg) == 4:
             device = msg[2]
@@ -1114,7 +1122,7 @@ class LiveOSCCallbacks:
             
             p = LiveUtils.getSong().master_track.devices[device].parameters[param]
         
-            self.oscServer.sendOSC("/live/master/device", (device, param, p.value, str(p.name)))
+            self.oscEndpoint.send("/live/master/device", (device, param, p.value, str(p.name)))
     
         elif len(msg) == 5:
             device = msg[2]
@@ -1123,7 +1131,7 @@ class LiveOSCCallbacks:
         
             LiveUtils.getSong().master_track.devices[device].parameters[param].value = value
 
-    def mdevicerangeCB(self, msg):
+    def mdevicerangeCB(self, msg, source):
         if len(msg) == 3:
             device = msg[2]
             po = [device]
@@ -1135,7 +1143,7 @@ class LiveOSCCallbacks:
                 po.append(params[i].max)
                 po.append(params[i].min)
             
-            self.oscServer.sendOSC("/live/master/device/range", tuple(po))
+            self.oscEndpoint.send("/live/master/device/range", tuple(po))
     
         elif len(msg) == 4:
             device = msg[2]
@@ -1143,9 +1151,9 @@ class LiveOSCCallbacks:
             
             p = LiveUtils.getSong().master_track.devices[device].parameters[param]
         
-            self.oscServer.sendOSC("/live/master/device/range", (device, param, p.min, p.max))
+            self.oscEndpoint.send("/live/master/device/range", (device, param, p.min, p.max))
             
-    def mdevicelistCB(self, msg):
+    def mdevicelistCB(self, msg, source):
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
             do = []
             devices = LiveUtils.getSong().master_track.devices
@@ -1154,19 +1162,19 @@ class LiveOSCCallbacks:
                 do.append(i)
                 do.append(str(devices[i].name))
             
-            self.oscServer.sendOSC("/live/master/devicelist", tuple(do))            
+            self.oscEndpoint.send("/live/master/devicelist", tuple(do))            
             
             
-    def crossfaderCB(self, msg):
+    def crossfaderCB(self, msg, source):
         if len(msg) == 2 or (len(msg) == 3 and msg[2] == "query"):
-            self.oscServer.sendOSC("/live/master/crossfader", float(LiveUtils.getSong().master_track.mixer_device.crossfader.value))
+            self.oscEndpoint.send("/live/master/crossfader", float(LiveUtils.getSong().master_track.mixer_device.crossfader.value))
         
         elif len(msg) == 3:
             val = msg[2]
             LiveUtils.getSong().master_track.mixer_device.crossfader.value = val
 
 
-    def loopStateCB(self, msg):
+    def loopStateCB(self, msg, source):
         type = msg[0] == '/live/clip/loopstate_id' and 1 or 0
     
         trackNumber = msg[2]
@@ -1174,15 +1182,15 @@ class LiveOSCCallbacks:
     
         if len(msg) == 4:
             if type == 1:
-                self.oscServer.sendOSC("/live/clip/loopstate", (trackNumber, clipNumber, int(LiveUtils.getClip(trackNumber, clipNumber).looping)))
+                self.oscEndpoint.send("/live/clip/loopstate", (trackNumber, clipNumber, int(LiveUtils.getClip(trackNumber, clipNumber).looping)))
             else:
-                self.oscServer.sendOSC("/live/clip/loopstate", (int(LiveUtils.getClip(trackNumber, clipNumber).looping)))    
+                self.oscEndpoint.send("/live/clip/loopstate", (int(LiveUtils.getClip(trackNumber, clipNumber).looping)))    
         
         elif len(msg) == 5:
             loopState = msg[4]
             LiveUtils.getClip(trackNumber, clipNumber).looping =  loopState
 
-    def loopStartCB(self, msg):
+    def loopStartCB(self, msg, source):
         type = msg[0] == '/live/clip/loopstart_id' and 1 or 0
         
         trackNumber = msg[2]
@@ -1190,30 +1198,30 @@ class LiveOSCCallbacks:
     
         if len(msg) == 4:
             if type == 1:
-                self.oscServer.sendOSC("/live/clip/loopstart", (trackNumber, clipNumber, float(LiveUtils.getClip(trackNumber, clipNumber).loop_start)))    
+                self.oscEndpoint.send("/live/clip/loopstart", (trackNumber, clipNumber, float(LiveUtils.getClip(trackNumber, clipNumber).loop_start)))    
             else:
-                self.oscServer.sendOSC("/live/clip/loopstart", (float(LiveUtils.getClip(trackNumber, clipNumber).loop_start)))    
+                self.oscEndpoint.send("/live/clip/loopstart", (float(LiveUtils.getClip(trackNumber, clipNumber).loop_start)))    
     
         elif len(msg) == 5:
             loopStart = msg[4]
             LiveUtils.getClip(trackNumber, clipNumber).loop_start = loopStart
             
-    def loopEndCB(self, msg):
+    def loopEndCB(self, msg, source):
         type = msg[0] == '/live/clip/loopend_id' and 1 or 0
     
         trackNumber = msg[2]
         clipNumber = msg[3]    
         if len(msg) == 4:
             if type == 1:
-                self.oscServer.sendOSC("/live/clip/loopend", (trackNumber, clipNumber, float(LiveUtils.getClip(trackNumber, clipNumber).loop_end)))
+                self.oscEndpoint.send("/live/clip/loopend", (trackNumber, clipNumber, float(LiveUtils.getClip(trackNumber, clipNumber).loop_end)))
             else:
-                self.oscServer.sendOSC("/live/clip/loopend", (float(LiveUtils.getClip(trackNumber, clipNumber).loop_end)))    
+                self.oscEndpoint.send("/live/clip/loopend", (float(LiveUtils.getClip(trackNumber, clipNumber).loop_end)))    
         
         elif len(msg) == 5:
             loopEnd = msg[4]
             LiveUtils.getClip(trackNumber, clipNumber).loop_end =  loopEnd
 
-    def quantizationCB(self, msg):
+    def quantizationCB(self, msg, source):
         quant = msg[2]
         LiveUtils.getSong().clip_trigger_quantization = quant
 
