@@ -194,7 +194,10 @@ TTime.prototype = {
         if (data.length < 8) {
             throw new ShortBuffer('time', data, 8);
         }
-        this.value = jspack.Unpack('>LL', data.slice(0, 8))[0];
+        var raw = jspack.Unpack('>LL', data.slice(0, 8));
+        var secs = raw[0];
+        var fracs = raw[1];
+        this.value = secs + fracs / 4294967296;
         return data.slice(8);
     },
     encode: function (buf, pos) {
@@ -272,6 +275,9 @@ function decode (data) {
         var time = new TTime;
         data = time.decode(data);
 
+        message.push('#bundle');
+        message.push(time.value);
+
         var length, part;
         while(data.length > 0) {
             length = new TInt;
@@ -325,11 +331,9 @@ var Server = function(port, host) {
     this._sock.bind(port);
     var server = this;
     this._sock.on('message', function (msg, rinfo) {
-        // on every message sent through the UDP socket...
-        // we decode the message getting a beautiful array with the form:
-        // [<address>, <typetags>, <values>*]
-        var decoded = decode(msg);
         try {
+            var decoded = decode(msg);
+            // [<address>, <typetags>, <values>*] 
             if (decoded) {
                 server.emit('message', decoded, rinfo);
                 server.emit(decoded[0], decoded, rinfo);
