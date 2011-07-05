@@ -49,6 +49,7 @@ var TrackPanel = new Class({
     },
 
     requestUpdate: function() {
+        console.log("request update")
         for (var i = 0; i < this.cols; i++) {
             this.send(this.messages.volume, 'i', i);
             this.send(this.messages.mute, 'i', i);
@@ -82,6 +83,7 @@ var TrackPanel = new Class({
     },
 
     onVolume: function(track, value) {
+        console.log("SEND VOLUME-->"+value)
         this.send(this.messages.volume, "if", track, value)
     },
 

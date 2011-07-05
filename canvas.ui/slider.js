@@ -53,8 +53,11 @@ var Slider = new Class({
         if (Math.abs(value - this._value) > 0.05) {
             this.lastEventTime = Number(new Date());
             this.value(value);
+            //console.log("slider.js- handle changed");
             this.fireEvent("change", this._value);
-        }
+        }/*else{
+            console.log("slider.js- handle changed --else");
+        }*/
     },
 
     onTouchDown: function(event) {

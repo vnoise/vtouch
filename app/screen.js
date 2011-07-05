@@ -61,19 +61,30 @@ var Screen = new Class({
                 }.bind(this)
             }
         });
-
-        this.clipMatrix = this.add({ type: ClipMatrix, active: true });
+        
+        //this.volumePanel = this.add({ type: VolumePanel });        
+        //this.addPanel("Volume", this.volumePanel);
+        //this.volumePanel.requestUpdate();
+        //this.push(this.volumePanel);
+        
+        
+        this.clipMatrix = this.add({ type: ClipMatrix });
         this.volumePanel = this.add({ type: VolumePanel });        
         this.sendPanel = this.add({ type: SendPanel });        
-        this.returnPanel = this.add({ type: ReturnPanel });        
-
+        this.returnPanel = this.add({ type: ReturnPanel }); 
+        
+        this.mainView = this.add({ type: MainView, active: true });
+        this.mainView.addPanel(this.clipMatrix);
+        this.mainView.addPanel(this.volumePanel);
+        
         this.panels = [];
+        this.addPanel("Main", this.mainView );
         this.addPanel("Clip", this.clipMatrix);
         this.addPanel("Volume", this.volumePanel);
         this.addPanel("Sends", this.sendPanel);
         this.addPanel("Returns", this.returnPanel);
 
-        this.activePanel = this.clipMatrix;
+        this.activePanel = this.mainView;
 
         for (var i = 0; i < 16; i++) {
             this.send('/live/name/track', 'i', i);
@@ -117,7 +128,12 @@ var Screen = new Class({
 
         this.navi.extent(0, this.height * 0.1 - 5, this.width * 0.1 - 5, this.height * 0.9);
         this.navi.doLayout();
-
+        
+        /*this.volumePanel.visible = true;
+        this.volumePanel.extent(0, this.height * 0.1 - 5, this.width * 0.1 - 5, this.height * 0.9);
+        this.volumePanel.doLayout();
+        */
+        
         this.hidePanels();
 
         this.activePanel.visible = true;

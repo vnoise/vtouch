@@ -67,16 +67,39 @@ var oscServer = new osc.Server(9001, '0.0.0.0');
 var oscClient = new _osc.Client(9000, '127.0.0.1');
 
 oscServer.on('message', function(message) {
-    // console.log(message);
-
-    for (var id in clients) {
-        clients[id].send({ 
-            address: message[0],
-            args: message.slice(1)
-        });
+    //console.log("HSHSHSHSHSHSHSHSHSH");
+    // console.log(message[0]);
+    
+    if (message[0] == '#bundle'){
+        //console.log("-bundle---------");
+        //console.log(message);
+        
+        for (i = 2; i < message.length; i++){
+            _address = "";
+            _args = "";
+            _address = message[i][0];
+            _args = message[i].slice(1,message[i].length);
+            //console.log("buffer content---->"+_address+"--->"+_args);
+            for (var id in clients) {
+                clients[id].send({ 
+                    address: _address,
+                    args: _args
+                });
+            }
+        }
+    }else{
+        //console.log("-message---------");
+        //console.log(message);
+        
+        for (var id in clients) {
+            //console.log("---mesage-slice ->"+message.slice(1));
+            clients[id].send({ 
+                address: message[0],
+                args: message.slice(1)
+            });
+        }
     }
 });
-
 var server = http.createServer(controller);
 
 server.listen(80, "0.0.0.0");

@@ -26,7 +26,8 @@ var Clip = new Class({
     },
 
     drawCanvas: function(context) { 
-        this.drawBackground(context, this._state == 0 ? this.bgColor : this._color);
+        //this.drawBackground(context, this._state == 0 ? this.bgColor : this._color);
+        this.drawBackground(context, this._color);
         this.drawLabel(context);
 
         if (this._state == 2){
@@ -52,7 +53,9 @@ var ClipMatrix = new Class({
 
     initialize: function(options) {
         Widget.prototype.initialize.call(this, options);
-
+        //console.log("sdksdkjsdjksjdksjdksdjksdjskd");
+        
+        //this.listen('/live/device/param', this.onDeviceParam.bind(this));
         this.listen('/live/name/track', this.onLiveName.bind(this));
         this.listen("/live/clip/info", this.onClipInfo.bind(this));
         this.listen("/live/name/clip", this.onClipName.bind(this));
@@ -118,11 +121,18 @@ var ClipMatrix = new Class({
         this.matrix[track][clip].clipPos(position / length);
     },
     
+    //(int track) (int device) (int param) (int value) (str name)
+    /*onDeviceParam: function(track, device, parameter,value,name){
+      console.log("onDeviceParam: "+track+", "+device+", "+parameter+","+value+","+name);  
+    },
+    */
     onClipName: function(track, clip, name,color) {
         r = (color >> 16) & 0xff;
         g = (color >> 8) & 0xff;
         b = (color >> 0) & 0xff;
         color =  "rgb("+r+","+g+","+b+")";
+        //console.log("onClipName---clipMatrix"+color);
+        
         this.matrix[track][clip].clipName(name,color);
     },
         
@@ -136,6 +146,12 @@ var ClipMatrix = new Class({
     },
     
     requestUpdate: function() {   
+        //console.log("request") 
+        //this.send("/live/device", "ii", 1, 0);
+        ///live/device            (int track, int device, int parameter,          Sets parameter on device on track number track to value
+        //                        int value)
+        //this.send("/live/device", "iii", 1, 0,2);
+        
         for (var x = 0; x < this.cols; x++) {
             for (var y = 0; y < this.rows; y++) {
                 this.send("/live/clip/info", "ii", x, y);
