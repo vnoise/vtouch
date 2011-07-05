@@ -67,13 +67,11 @@ var oscServer = new osc.Server(9001, '0.0.0.0');
 var oscClient = new _osc.Client(9000, '127.0.0.1');
 
 oscServer.on('message', function(message) {
-    //console.log("HSHSHSHSHSHSHSHSHSH");
-    //console.log(message[0]);
-    
+
     if (message[0] == '#bundle'){
         console.log("-bundle---------");
         console.log(message);
-        
+    
         for (i = 2; i < message.length; i++){
             _address = "";
             _args = "";

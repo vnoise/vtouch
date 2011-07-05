@@ -131,9 +131,10 @@ var ClipMatrix = new Class({
         g = (color >> 8) & 0xff;
         b = (color >> 0) & 0xff;
         color =  "rgb("+r+","+g+","+b+")";
-        //console.log("onClipName---clipMatrix"+color);
-        
-        this.matrix[track][clip].clipName(name,color);
+        console.log(track +","+clip);
+        if (this.matrix[track][clip] != undefined){
+            this.matrix[track][clip].clipName(name,color);
+        }
     },
         
     onClipInfo: function(track, clip, state) {
@@ -146,21 +147,7 @@ var ClipMatrix = new Class({
     },
     
     requestUpdate: function() {   
-        //console.log("request") 
-        //this.send("/live/device", "ii", 1, 0);
-        ///live/device            (int track, int device, int parameter,          Sets parameter on device on track number track to value
-        //                        int value)
-        //this.send("/live/device", "iii", 1, 0,2);
-        
-        /*console.log(this.cols);
-        console.log(this.rows);
-        for (var x = 0; x < this.cols; x++) {
-            for (var y = 0; y < this.rows; y++) {
-                this.send("/live/clip/info", "ii", x, y);
-                this.send("/live/name/clip", "ii", x, y);
-            }
-       }*/
-       
+    
        this.send("/live/name/clip",'s', "query");
        this.send("/live/name/track",'s', "query");
     },
