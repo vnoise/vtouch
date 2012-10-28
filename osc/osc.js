@@ -1,4 +1,3 @@
-require.paths.unshift(__dirname + '/node-jspack');
 var buffer = require('buffer');
 var dgram = require('dgram');
 var sys = require('sys');
